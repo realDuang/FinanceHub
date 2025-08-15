@@ -1,0 +1,17 @@
+logs
+*.log
+node_modules
+dist
+dist-ssr
+*.local
+__pycache__
+
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+
+**/.env
+**/venv/**
+
+**/*.csv
+**/*.db
