@@ -4,7 +4,15 @@ import type {
   UseApiReturn,
   FinancialRecordsOptions,
 } from "./types";
-import api from "../services/api";
+import api, {
+  getExpensePieData,
+  getIncomeExpenseData,
+  getMonthlyExpenseData,
+  getTrendData,
+  getOverviewStats,
+  getRecentRecords,
+  getLatestRecord,
+} from "../services/api";
 
 /**
  * 通用API请求Hook
@@ -60,15 +68,6 @@ export function useFinancialRecords(options: FinancialRecordsOptions = {}) {
 }
 
 /**
- * 年度数据Hook
- */
-export function useYearData(year: number | null) {
-  return useApi(() => api.getRecordsByYear(year!), [year], {
-    immediate: !!year,
-  });
-}
-
-/**
  * 日期范围数据Hook
  */
 export function useDateRangeData(
@@ -80,13 +79,6 @@ export function useDateRangeData(
     [startDate, endDate],
     { immediate: !!(startDate && endDate) }
   );
-}
-
-/**
- * 汇总统计Hook
- */
-export function useSummary() {
-  return useApi(() => api.getSummary());
 }
 
 /**
@@ -126,6 +118,57 @@ export function useTopExpenseCategories(limit: number = 5) {
  */
 export function useBalanceTrend() {
   return useApi(() => api.getBalanceTrend());
+}
+
+// === 组件专用API Hooks ===
+
+/**
+ * 支出饼图数据Hook (用于ExpensePieChart组件)
+ */
+export function useExpensePieData() {
+  return useApi(() => getExpensePieData());
+}
+
+/**
+ * 收入支出对比数据Hook (用于IncomeExpenseChart组件)
+ */
+export function useIncomeExpenseData(months: number = 12) {
+  return useApi(() => getIncomeExpenseData(months), [months]);
+}
+
+/**
+ * 月度支出分类数据Hook (用于MonthlyExpenseChart组件)
+ */
+export function useMonthlyExpenseData(months: number = 12) {
+  return useApi(() => getMonthlyExpenseData(months), [months]);
+}
+
+/**
+ * 趋势数据Hook (用于TrendChart组件)
+ */
+export function useTrendData(months: number = 12) {
+  return useApi(() => getTrendData(months), [months]);
+}
+
+/**
+ * 概览统计数据Hook (用于Overview组件)
+ */
+export function useOverviewStats() {
+  return useApi(() => getOverviewStats());
+}
+
+/**
+ * 最近记录Hook
+ */
+export function useRecentRecords(months: number = 12) {
+  return useApi(() => getRecentRecords(months), [months]);
+}
+
+/**
+ * 最新记录Hook
+ */
+export function useLatestRecord() {
+  return useApi(() => getLatestRecord());
 }
 
 /**

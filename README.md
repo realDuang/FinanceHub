@@ -162,7 +162,6 @@ visualize-balance-management-tool/
 - `GET /api/v1/records` - 获取所有记录（分页）
 - `GET /api/v1/records/year/{year}` - 按年份查询
 - `GET /api/v1/records/range` - 按日期范围查询
-- `GET /api/v1/summary` - 获取汇总统计
 
 ### 数据分析
 
@@ -200,7 +199,7 @@ source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
 # 导入示例数据（可选）
-python scripts/import_data.py ../dataset.csv
+python scripts/import_transaction_data.py ../dataset.csv
 
 # 启动后端服务
 python main.py

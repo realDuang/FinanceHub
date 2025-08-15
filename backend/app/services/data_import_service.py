@@ -1,9 +1,7 @@
 import pandas as pd
 import os
-from typing import Optional
 from sqlalchemy.orm import Session
-from app.models.base import FinancialRecord, Summary
-from app.database.connection import get_db
+from app.models.base import FinancialAggregation
 
 class DataImportService:
     """数据导入服务"""
@@ -36,15 +34,14 @@ class DataImportService:
             imported_count = 0
             
             # 清除现有数据
-            db.query(FinancialRecord).delete()
-            db.query(Summary).delete()
+            db.query(FinancialAggregation).delete()
             
             # 导入每月数据
             for index, row in data_rows.iterrows():
                 if pd.isna(row.iloc[0]) or row.iloc[0] == '':
                     continue
                     
-                record = FinancialRecord(
+                record = FinancialAggregation(
                     month_date=str(row.iloc[0]),
                     housing=float(row.iloc[1]) if pd.notna(row.iloc[1]) else 0.0,
                     dining=float(row.iloc[2]) if pd.notna(row.iloc[2]) else 0.0,
@@ -64,27 +61,6 @@ class DataImportService:
                 db.add(record)
                 imported_count += 1
             
-            # 获取总计行数据（倒数第一行）
-            total_row = df.iloc[-1]
-            
-            # 创建汇总记录
-            summary = Summary(
-                total_months=int(total_months),
-                total_housing=float(total_row.iloc[1]) if pd.notna(total_row.iloc[1]) else 0.0,
-                total_dining=float(total_row.iloc[2]) if pd.notna(total_row.iloc[2]) else 0.0,
-                total_living=float(total_row.iloc[3]) if pd.notna(total_row.iloc[3]) else 0.0,
-                total_entertainment=float(total_row.iloc[4]) if pd.notna(total_row.iloc[4]) else 0.0,
-                total_transportation=float(total_row.iloc[5]) if pd.notna(total_row.iloc[5]) else 0.0,
-                total_travel=float(total_row.iloc[6]) if pd.notna(total_row.iloc[6]) else 0.0,
-                total_gifts=float(total_row.iloc[7]) if pd.notna(total_row.iloc[7]) else 0.0,
-                total_transactions=float(total_row.iloc[8]) if pd.notna(total_row.iloc[8]) else 0.0,
-                total_social_expenses=float(total_row.iloc[9]) if pd.notna(total_row.iloc[9]) else 0.0,
-                total_salary=float(total_row.iloc[10]) if pd.notna(total_row.iloc[10]) else 0.0,
-                total_balance=float(total_row.iloc[11]) if pd.notna(total_row.iloc[11]) else 0.0,
-                total_avg_consumption=float(total_row.iloc[12]) if pd.notna(total_row.iloc[12]) else 0.0,
-            )
-            
-            db.add(summary)
             db.commit()
             
             return {

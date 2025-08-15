@@ -1,9 +1,98 @@
+import enum
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from datetime import datetime
 
-class FinancialRecordBase(BaseModel):
-    """财务记录基础模型"""
+
+class TransactionType(enum.Enum):
+    """交易类型枚举"""
+
+    HOUSING = "住房"
+    DINING = "餐饮"
+    LIVING = "生活"
+    ENTERTAINMENT = "娱乐"
+    TRANSPORTATION = "交通"
+    TRAVEL = "旅行"
+    GIFTS = "礼物"
+    TRANSACTIONS = "交易"
+    SOCIAL_EXPENSES = "人情"
+    SALARY = "工资"
+
+
+class IncomeExpenseType(enum.Enum):
+    """收支类型枚举"""
+
+    INCOME = "收入"
+    EXPENSE = "支出"
+
+
+# 交易记录相关模型
+class TransactionDetailBase(BaseModel):
+    """交易明细基础模型"""
+
+    transaction_time: datetime
+    category: str
+    amount: float
+    income_expense_type: str
+    payment_method: Optional[str] = None
+    counterparty: Optional[str] = None
+    item_name: Optional[str] = None
+    remarks: Optional[str] = None
+
+
+class TransactionDetail(TransactionDetailBase):
+    """交易明细响应模型"""
+
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+# 筛选查询模型
+class TransactionFilterQuery(BaseModel):
+    """交易记录筛选查询模型"""
+
+    start_date: Optional[str] = None
+    end_date: Optional[str] = None
+    categories: Optional[List[str]] = None
+    income_expense_types: Optional[List[str]] = None
+    payment_methods: Optional[List[str]] = None
+    counterparties: Optional[List[str]] = None
+    min_amount: Optional[float] = None
+    max_amount: Optional[float] = None
+    keyword: Optional[str] = None
+    skip: int = 0
+    limit: int = 100
+    order_by: str = "transaction_time"
+    order_direction: str = "desc"
+
+
+# 分页信息模型
+class PaginationInfo(BaseModel):
+    """分页信息模型"""
+
+    skip: int
+    limit: int
+    has_more: bool
+
+
+# 筛选结果模型
+class TransactionFilterResult(BaseModel):
+    """交易筛选结果模型"""
+
+    records: List[TransactionDetail]
+    total: int
+    filters_applied: List[str]
+    pagination: PaginationInfo
+
+
+# 财务聚合记录相关模型
+class FinancialAggregationBase(BaseModel):
+    """财务聚合记录基础模型"""
+
     month_date: str
     housing: float = 0.0
     dining: float = 0.0
@@ -19,87 +108,23 @@ class FinancialRecordBase(BaseModel):
     avg_consumption: float = 0.0
     recent_avg_consumption: float = 0.0
 
-class FinancialRecordCreate(FinancialRecordBase):
-    """创建财务记录模型"""
-    pass
 
-class FinancialRecord(FinancialRecordBase):
-    """财务记录响应模型"""
+class FinancialAggregation(FinancialAggregationBase):
+    """财务聚合记录响应模型"""
+
     id: int
     created_at: datetime
     updated_at: datetime
-    
+
     class Config:
         from_attributes = True
 
-class SummaryBase(BaseModel):
-    """汇总基础模型"""
-    total_months: int
-    total_housing: float = 0.0
-    total_dining: float = 0.0
-    total_living: float = 0.0
-    total_entertainment: float = 0.0
-    total_transportation: float = 0.0
-    total_travel: float = 0.0
-    total_gifts: float = 0.0
-    total_transactions: float = 0.0
-    total_social_expenses: float = 0.0
-    total_salary: float = 0.0
-    total_balance: float = 0.0
-    total_avg_consumption: float = 0.0
 
-class Summary(SummaryBase):
-    """汇总响应模型"""
-    id: int
-    created_at: datetime
-    updated_at: datetime
-    
-    class Config:
-        from_attributes = True
+# 财务记录查询模型
+class FinancialQuery(BaseModel):
+    """财务记录查询模型"""
 
-class ImportResult(BaseModel):
-    """导入结果模型"""
-    success: bool
-    message: str
-    imported_records: int
-    total_months: int
-
-class CategoryTrend(BaseModel):
-    """类别趋势模型"""
-    date: str
-    value: float
-
-class MonthlyBreakdown(BaseModel):
-    """月度分解模型"""
-    month_date: str
-    expenses: Dict[str, float]
-    income: Dict[str, float]
-    balance: float
-
-class YearComparison(BaseModel):
-    """年度对比模型"""
-    year: str
-    total_expenses: float
-    total_income: float
-    net_balance: float
-    months_count: int
-
-class TopExpenseCategory(BaseModel):
-    """顶级支出类别模型"""
-    category: str
-    total_amount: float
-
-class BalanceTrend(BaseModel):
-    """结余趋势模型"""
-    date: str
-    balance: float
-
-class DateRangeQuery(BaseModel):
-    """日期范围查询模型"""
-    start_date: str
-    end_date: str
-
-class PaginationQuery(BaseModel):
-    """分页查询模型"""
     skip: int = 0
     limit: int = 100
+    order_by: str = "month_date"
+    order_direction: str = "desc"

@@ -6,7 +6,6 @@ import TrendChart from "../components/TrendChart";
 import ExpensePieChart from "../components/ExpensePieChart";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
 import {
-  useSummary,
   useYearComparison,
   useTopExpenseCategories,
   useBalanceTrend,
@@ -16,14 +15,7 @@ import {
  * 财务管理仪表板
  */
 const Dashboard: React.FC = () => {
-  const [selectedFile, setSelectedFile] = useState(null);
-
   // 使用API Hooks
-  const {
-    data: summary,
-    loading: summaryLoading,
-    error: summaryError,
-  } = useSummary();
   const { data: yearComparison, loading: yearLoading } = useYearComparison();
   const { data: topExpenses, loading: expensesLoading } =
     useTopExpenseCategories(5);

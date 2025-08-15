@@ -21,13 +21,6 @@ export interface PaginatedResponse<T> {
   limit: number;
 }
 
-export interface SummaryData {
-  totalIncome: number;
-  totalExpense: number;
-  balance: number;
-  recordCount: number;
-}
-
 export interface CategoryTrend {
   category: string;
   data: Array<{
