@@ -18,6 +18,12 @@ export interface TransactionDetailBase {
   remarks?: string;
 }
 
+export interface TransactionDetail extends TransactionDetailBase {
+  id: number;
+  created_at: string;
+  updated_at: string;
+}
+
 // 筛选查询接口
 export interface TransactionFilterQuery {
   start_date?: string;
@@ -31,24 +37,50 @@ export interface TransactionFilterQuery {
   keyword?: string;
   skip?: number;
   limit?: number;
-  order_by?: keyof TransactionDetailBase;
+  order_by?: "transaction_time" | "category" | "amount" | "income_expense_type" | "payment_method" | "counterparty" | "item_name" | "remarks";
   order_direction?: "asc" | "desc";
+}
+
+// 分页信息接口
+export interface PaginationInfo {
+  skip: number;
+  limit: number;
+  has_more: boolean;
+}
+
+// 筛选结果接口
+export interface TransactionFilterResult {
+  records: TransactionDetail[];
+  total: number;
+  filters_applied: string[];
+  pagination: PaginationInfo;
 }
 
 // 财务聚合记录相关接口
 export interface FinancialAggregationRecord {
+  id: number;
   month_date: string;
-  housing?: number;
-  dining?: number;
-  living?: number;
-  entertainment?: number;
-  transportation?: number;
-  travel?: number;
-  gifts?: number;
-  transactions?: number;
-  social_expenses?: number;
-  salary?: number;
-  balance?: number;
-  avg_consumption?: number;
-  recent_avg_consumption?: number;
+  housing: number;
+  dining: number;
+  living: number;
+  entertainment: number;
+  transportation: number;
+  travel: number;
+  gifts: number;
+  transactions: number;
+  social_expenses: number;
+  salary: number;
+  balance: number;
+  avg_consumption: number;
+  recent_avg_consumption: number;
+  created_at: string;
+  updated_at: string;
+}
+
+// 财务记录查询接口
+export interface FinancialQuery {
+  skip?: number;
+  limit?: number;
+  order_by?: string;
+  order_direction?: "asc" | "desc";
 }

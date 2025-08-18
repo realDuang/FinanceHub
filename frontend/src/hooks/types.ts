@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export interface ApiOptions<T = any> {
   immediate?: boolean;
   onSuccess?: (data: T) => void;

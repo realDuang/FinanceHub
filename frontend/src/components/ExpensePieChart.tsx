@@ -1,75 +1,114 @@
-import React, { useRef } from 'react';
+import React, { useRef } from "react";
 import {
   Chart as ChartJS,
   ArcElement,
   Tooltip,
   Legend,
-  ChartOptions
-} from 'chart.js';
-import { Chart } from 'react-chartjs-2';
-import { financialData, expenseCategories } from '../interface/financialData';
+  ChartOptions,
+} from "chart.js";
+import { Chart } from "react-chartjs-2";
+import { expenseCategories } from "../utils/chart-utils";
+import { FinancialAggregationRecord } from "../services/types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const ExpensePieChart: React.FC = () => {
-  const chartRef = useRef<ChartJS<'doughnut'>>(null);
+interface ExpensePieChartProps {
+  financialData: FinancialAggregationRecord[] | null;
+  loading: boolean;
+}
+
+const ExpensePieChart: React.FC<ExpensePieChartProps> = ({ 
+  financialData, 
+  loading 
+}) => {
+  const chartRef = useRef<ChartJS<"doughnut">>(null);
+
+  // 处理 loading 状态和空数据
+  if (loading) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+        <div className="h-96 w-full flex items-center justify-center">
+          <div className="text-gray-500">加载中...</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (!financialData || financialData.length === 0) {
+    return (
+      <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
+        <div className="h-96 w-full flex items-center justify-center">
+          <div className="text-gray-500">暂无数据</div>
+        </div>
+      </div>
+    );
+  }
 
   // 计算最新月份各类别支出总额
   const latestRecord = financialData[financialData.length - 1];
-  
-  const categoryData = expenseCategories.map(category => ({
-    ...category,
-    value: Math.abs(latestRecord[category.key as keyof typeof latestRecord] as number)
-  })).filter(item => item.value > 0);
+
+  const categoryData = expenseCategories
+    .map((category) => ({
+      ...category,
+      value: Math.abs(
+        latestRecord[category.key as keyof typeof latestRecord] as number
+      ),
+    }))
+    .filter((item) => item.value > 0);
 
   const data = {
-    labels: categoryData.map(item => item.label),
+    labels: categoryData.map((item) => item.label),
     datasets: [
       {
-        data: categoryData.map(item => item.value),
-        backgroundColor: categoryData.map(item => item.color),
-        borderColor: categoryData.map(item => item.color),
+        data: categoryData.map((item) => item.value),
+        backgroundColor: categoryData.map((item) => item.color),
+        borderColor: categoryData.map((item) => item.color),
         borderWidth: 2,
-        hoverOffset: 8
-      }
-    ]
+        hoverOffset: 8,
+      },
+    ],
   };
 
-  const options: ChartOptions<'doughnut'> = {
+  const options: ChartOptions<"doughnut"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'right' as const,
+        position: "right" as const,
         labels: {
           padding: 15,
           usePointStyle: true,
           font: {
-            size: 12
-          }
-        }
+            size: 12,
+          },
+        },
       },
       title: {
         display: true,
-        text: '支出类别分布',
+        text: "支出类别分布",
         font: {
           size: 16,
-          weight: 'bold'
+          weight: "bold",
         },
-        padding: 20
+        padding: 20,
       },
       tooltip: {
         callbacks: {
-          label: function(context) {
+          label: function (context) {
             const value = context.parsed as number;
-            const total = categoryData.reduce((sum, item) => sum + item.value, 0);
+            const total = categoryData.reduce(
+              (sum, item) => sum + item.value,
+              0
+            );
             const percentage = ((value / total) * 100).toFixed(1);
-            return `${context.label}: ¥${value.toLocaleString()} (${percentage}%)`;
-          }
-        }
-      }
+            return `${
+              context.label
+            }: ¥${value.toLocaleString()} (${percentage}%)`;
+          },
+        },
+      },
     },
-    cutout: '50%'
+    cutout: "50%",
   };
 
   return (

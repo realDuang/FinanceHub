@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { API_BASE_URL } from "./constants";
-import type { FinancialAggregationRecord, RequestOptions } from "./types";
+import type {
+  FinancialAggregationRecord,
+  FinancialQuery,
+  RequestOptions,
+  TransactionFilterQuery,
+  TransactionFilterResult,
+} from "./types";
 
 class RequestAPI {
   private baseURL: string;
@@ -49,7 +55,22 @@ class RequestAPI {
     endpoint: string,
     params: Record<string, any> = {}
   ): Promise<T> {
-    const searchParams = new URLSearchParams(params);
+    const searchParams = new URLSearchParams();
+
+    // 处理查询参数，过滤掉undefined值
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value)) {
+          // 处理数组参数
+          value.forEach((item) => {
+            searchParams.append(key, String(item));
+          });
+        } else {
+          searchParams.append(key, String(value));
+        }
+      }
+    });
+
     const url = searchParams.toString()
       ? `${endpoint}?${searchParams}`
       : endpoint;
@@ -89,32 +110,50 @@ class FinancialAPI extends RequestAPI {
     super();
   }
 
-  // === 财务聚合录查询API ===
+  // === 交易记录查询API ===
 
   /**
-   * 获取所有财务记录（分页）- 返回聚合后的月度数据
+   * 根据多种条件筛选交易记录
    */
-  async getRecords(
-    skip: number = 0,
-    limit: number = 100
+  async searchTransactionDetails(
+    filterQuery: TransactionFilterQuery
+  ): Promise<TransactionFilterResult> {
+    return this.post<TransactionFilterResult>(
+      "/transactions/search",
+      filterQuery
+    );
+  }
+
+  // === 财务聚合记录查询API ===
+
+  /**
+   * 获取财务聚合记录（分页）- 返回聚合后的月度数据
+   */
+  async getFinancialAggregationRecords(
+    query: FinancialQuery = {}
   ): Promise<FinancialAggregationRecord[]> {
-    return this.get<FinancialAggregationRecord[]>("/records", {
+    const {
+      skip = 0,
+      limit = 100,
+      order_by = "month_date",
+      order_direction = "desc",
+    } = query;
+
+    return this.get<FinancialAggregationRecord[]>("/financial/records", {
       skip,
       limit,
+      order_by,
+      order_direction,
     });
   }
 
+  // === 健康检查API ===
+
   /**
-   * 根据日期范围获取财务记录
+   * 健康检查
    */
-  async getRecordsByDateRange(
-    startDate: string,
-    endDate: string
-  ): Promise<FinancialAggregationRecord[]> {
-    return this.get<FinancialAggregationRecord[]>("/records/range", {
-      start_date: startDate,
-      end_date: endDate,
-    });
+  async healthCheck(): Promise<{ status: string; message: string }> {
+    return this.get<{ status: string; message: string }>("/health");
   }
 }
 
@@ -123,9 +162,12 @@ const api = new FinancialAPI();
 
 // 导出常用方法
 export const {
+  // 交易记录
+  searchTransactionDetails,
   // 财务记录
-  getRecords,
-  getRecordsByDateRange,
+  getFinancialAggregationRecords,
+  // 健康检查
+  healthCheck,
 } = api;
 
 export default api;

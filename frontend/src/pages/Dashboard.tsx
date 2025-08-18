@@ -1,33 +1,17 @@
-import React, { useState } from "react";
+import React from "react";
 import { BarChart3, PieChart, TrendingUp, Wallet } from "lucide-react";
 import Overview from "../components/Overview";
 import MonthlyExpenseChart from "../components/MonthlyExpenseChart";
 import TrendChart from "../components/TrendChart";
 import ExpensePieChart from "../components/ExpensePieChart";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
-import {
-  useYearComparison,
-  useTopExpenseCategories,
-  useBalanceTrend,
-} from "../hooks/useApi";
+import { useGetFinancialAggregationRecords } from "../hooks/useApi";
 
 /**
  * 财务管理仪表板
  */
 const Dashboard: React.FC = () => {
-  // 使用API Hooks
-  const { data: yearComparison, loading: yearLoading } = useYearComparison();
-  const { data: topExpenses, loading: expensesLoading } =
-    useTopExpenseCategories(5);
-  const { data: balanceTrend, loading: trendLoading } = useBalanceTrend();
-
-  // 格式化金额
-  const formatAmount = (amount) => {
-    return new Intl.NumberFormat("zh-CN", {
-      style: "currency",
-      currency: "CNY",
-    }).format(amount || 0);
-  };
+  const { data: financialData, loading } = useGetFinancialAggregationRecords();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -64,53 +48,57 @@ const Dashboard: React.FC = () => {
             <TrendingUp className="w-5 h-5 text-blue-600" />
             <h2 className="text-lg font-semibold text-gray-900">财务概览</h2>
           </div>
-          <Overview />
+          <Overview financialData={financialData} loading={loading} />
         </div>
 
         {/* 图表区域 */}
         <div className="space-y-8">
-          {/* 第一行：月度支出和趋势分析 */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <BarChart3 className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  月度支出分析
-                </h3>
-              </div>
-              <MonthlyExpenseChart />
+          {/* 月度支出分析 */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <BarChart3 className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                月度支出分析
+              </h3>
             </div>
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <TrendingUp className="w-5 h-5 text-green-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  消费趋势分析
-                </h3>
-              </div>
-              <TrendChart />
-            </div>
+            <MonthlyExpenseChart
+              financialData={financialData}
+              loading={loading}
+            />
           </div>
 
-          {/* 第二行：支出分布和收支对比 */}
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-8">
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <PieChart className="w-5 h-5 text-purple-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  支出类别分布
-                </h3>
-              </div>
-              <ExpensePieChart />
+          {/* 消费趋势分析 */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <TrendingUp className="w-5 h-5 text-green-600" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                消费趋势分析
+              </h3>
             </div>
-            <div>
-              <div className="flex items-center space-x-2 mb-4">
-                <Wallet className="w-5 h-5 text-blue-600" />
-                <h3 className="text-lg font-semibold text-gray-900">
-                  收支对比
-                </h3>
-              </div>
-              <IncomeExpenseChart />
+            <TrendChart financialData={financialData} loading={loading} />
+          </div>
+
+          {/* 支出类别分布 */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <PieChart className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-semibold text-gray-900">
+                支出类别分布
+              </h3>
             </div>
+            <ExpensePieChart financialData={financialData} loading={loading} />
+          </div>
+
+          {/* 收支对比 */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <Wallet className="w-5 h-5 text-blue-600" />
+              <h3 className="text-lg font-semibold text-gray-900">收支对比</h3>
+            </div>
+            <IncomeExpenseChart
+              financialData={financialData}
+              loading={loading}
+            />
           </div>
         </div>
 

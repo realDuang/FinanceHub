@@ -48,7 +48,7 @@ def get_financial_records(
     skip: int = Query(default=0, ge=0),
     limit: int = Query(default=100, ge=1, le=1000),
     order_by: str = Query(default="month_date"),
-    order_direction: str = Query(default="desc"),
+    order_direction: str = Query(default="asc"),
     db: Session = Depends(get_db)
 ):
     """
