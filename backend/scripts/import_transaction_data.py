@@ -12,6 +12,7 @@ import pandas as pd
 from datetime import datetime
 from app.database.connection import SessionLocal, create_tables
 from app.models.base import TransactionDetail
+from app.schemas import TransactionType, IncomeExpenseType, PaymentMethod
 
 def parse_transaction_time(time_str):
     """解析交易时间字符串"""

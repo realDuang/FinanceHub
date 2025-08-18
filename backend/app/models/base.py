@@ -2,6 +2,8 @@ from sqlalchemy import Column, Integer, String, Float, DateTime, Text, Enum
 from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
 
+from app.schemas import IncomeExpenseType, PaymentMethod, TransactionType
+
 
 Base = declarative_base()
 
@@ -13,15 +15,19 @@ class TransactionDetail(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     transaction_time = Column(DateTime, nullable=False, index=True)  # 交易时间
-    category = Column(String(50), nullable=False, index=True)  # 类型 (住房、餐饮等)
+    category = Column(
+        Enum(TransactionType), nullable=False, index=True
+    )  # 类型 (住房、餐饮等)
     amount = Column(Float, nullable=False)  # 金额
-    income_expense_type = Column(String(10), nullable=False, index=True)  # 收/支
-    payment_method = Column(String(50), nullable=True)  # 支付方式
+    income_expense_type = Column(
+        Enum(IncomeExpenseType), nullable=False, index=True
+    )  # 收/支
+    payment_method = Column(Enum(PaymentMethod), nullable=True)  # 支付方式
     counterparty = Column(String(200), nullable=True)  # 交易对方
     item_name = Column(String(500), nullable=True)  # 商品名称
     remarks = Column(Text, nullable=True)  # 备注
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
 
 class FinancialAggregation(Base):
@@ -44,5 +50,5 @@ class FinancialAggregation(Base):
     balance = Column(Float, default=0.0)  # 结余
     avg_consumption = Column(Float, default=0.0)  # 均匀消费支出(房租均摊)
     recent_avg_consumption = Column(Float, default=0.0)  # 近三月均匀消费支出
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)

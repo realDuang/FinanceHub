@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import func, extract, desc, asc, and_, or_
-from app.models.base import TransactionDetail, TransactionType
+from app.models.base import TransactionDetail
 
 
 class TransactionService:

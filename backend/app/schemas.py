@@ -2,6 +2,7 @@ import enum
 from pydantic import BaseModel
 from typing import Optional, List, Dict, Any
 from datetime import datetime
+from typing import Literal
 
 
 class TransactionType(enum.Enum):
@@ -25,16 +26,25 @@ class IncomeExpenseType(enum.Enum):
     INCOME = "收入"
     EXPENSE = "支出"
 
+class PaymentMethod(enum.Enum):
+    """支付方式枚举"""
+    
+    ALIPAY = "支付宝"
+    WECHAT_PAY = "微信支付"
+    RELATIVE_CARD = "亲属卡"
+    ICBC = "工商银行"
+    CMB = "招商银行"
+    BANK_OF_CHINA = "中国银行"
 
 # 交易记录相关模型
 class TransactionDetailBase(BaseModel):
     """交易明细基础模型"""
 
     transaction_time: datetime
-    category: str
+    category: TransactionType
     amount: float
-    income_expense_type: str
-    payment_method: Optional[str] = None
+    income_expense_type: IncomeExpenseType
+    payment_method: Optional[PaymentMethod] = None
     counterparty: Optional[str] = None
     item_name: Optional[str] = None
     remarks: Optional[str] = None
@@ -57,17 +67,17 @@ class TransactionFilterQuery(BaseModel):
 
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    categories: Optional[List[str]] = None
-    income_expense_types: Optional[List[str]] = None
-    payment_methods: Optional[List[str]] = None
+    categories: Optional[List[TransactionType]] = None
+    income_expense_types: Optional[List[IncomeExpenseType]] = None
+    payment_methods: Optional[List[PaymentMethod]] = None
     counterparties: Optional[List[str]] = None
     min_amount: Optional[float] = None
     max_amount: Optional[float] = None
     keyword: Optional[str] = None
     skip: int = 0
     limit: int = 100
-    order_by: str = "transaction_time"
-    order_direction: str = "desc"
+    order_by: Literal["transaction_time", "category", "amount", "income_expense_type", "payment_method", "counterparty", "item_name", "remarks"] = "transaction_time"
+    order_direction: Literal["asc", "desc"] = "desc"
 
 
 # 分页信息模型
@@ -127,4 +137,4 @@ class FinancialQuery(BaseModel):
     skip: int = 0
     limit: int = 100
     order_by: str = "month_date"
-    order_direction: str = "desc"
+    order_direction: Literal["asc", "desc"] = "desc"

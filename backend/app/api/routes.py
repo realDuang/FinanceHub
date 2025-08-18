@@ -5,8 +5,8 @@ import tempfile
 import os
 
 from app.database.connection import get_db
-from backend.app.services.analyze.financial_service import FinancialService
-from backend.app.services.analyze.transaction_service import TransactionService
+from app.services.analyze.financial_service import FinancialService
+from app.services.analyze.transaction_service import TransactionService
 from app import schemas
 
 router = APIRouter()
