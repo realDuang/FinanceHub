@@ -134,9 +134,11 @@ class FinancialAPI extends RequestAPI {
   ): Promise<FinancialAggregationRecord[]> {
     const {
       skip = 0,
-      limit = 100,
+      limit = 999,
       order_by = "month_date",
-      order_direction = "desc",
+      order_direction = "asc",
+      start_date,
+      end_date,
     } = query;
 
     return this.get<FinancialAggregationRecord[]>("/financial/records", {
@@ -144,6 +146,8 @@ class FinancialAPI extends RequestAPI {
       limit,
       order_by,
       order_direction,
+      start_date,
+      end_date,
     });
   }
 

@@ -46,9 +46,11 @@ def search_transactions(
 @router.get("/financial/records", response_model=List[schemas.FinancialAggregation])
 def get_financial_records(
     skip: int = Query(default=0, ge=0),
-    limit: int = Query(default=100, ge=1, le=1000),
+    limit: int = Query(default=100, ge=1, le=10000),
     order_by: str = Query(default="month_date"),
     order_direction: str = Query(default="asc"),
+    start_date: Optional[str] = Query(default=None, description="开始日期，格式：YYYY-MM-DD"),
+    end_date: Optional[str] = Query(default=None, description="结束日期，格式：YYYY-MM-DD"),
     db: Session = Depends(get_db)
 ):
     """
@@ -61,6 +63,8 @@ def get_financial_records(
             limit=limit,
             order_by=order_by,
             order_direction=order_direction,
+            start_date=start_date,
+            end_date=end_date,
         )
         return result
     except Exception as e:

@@ -1,17 +1,37 @@
-import React from "react";
+import React, { useState, useMemo } from "react";
 import { BarChart3, PieChart, TrendingUp, Wallet } from "lucide-react";
 import Overview from "../components/Overview";
 import MonthlyExpenseChart from "../components/MonthlyExpenseChart";
 import TrendChart from "../components/TrendChart";
 import ExpensePieChart from "../components/ExpensePieChart";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
-import { useGetFinancialAggregationRecords } from "../hooks/useApi";
+import TimeRangeSelector, { TimeRange } from "../components/TimeRangeSelector";
+import { useGetFinancialAggregationRecords, useGetAllFinancialRecords } from "../hooks/useApi";
+import { getDateRangeFromTimeRange, formatDateRangeText, getLatestDataDate } from "../utils/date-utils";
 
 /**
  * 财务管理仪表板
  */
 const Dashboard: React.FC = () => {
-  const { data: financialData, loading } = useGetFinancialAggregationRecords();
+  const [timeRange, setTimeRange] = useState<TimeRange>('all');
+  
+  // 获取所有数据用于计算日期范围
+  const { data: allData } = useGetAllFinancialRecords();
+  
+  // 根据时间范围计算日期
+  const dateRange = useMemo(() => getDateRangeFromTimeRange(timeRange, allData || undefined), [timeRange, allData]);
+  
+  // 计算最新数据的截止时间
+  const latestDataDate = useMemo(() => getLatestDataDate(allData || undefined), [allData]);
+  
+  const { data: financialData, loading } = useGetFinancialAggregationRecords(
+    dateRange.startDate,
+    dateRange.endDate
+  );
+
+  const handleTimeRangeChange = (newTimeRange: TimeRange) => {
+    setTimeRange(newTimeRange);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
@@ -31,9 +51,10 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
+              <TimeRangeSelector value={timeRange} onChange={handleTimeRangeChange} />
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <BarChart3 className="w-4 h-4" />
-                <span>数据更新至 2024年12月</span>
+                <span>数据范围: {formatDateRangeText(timeRange, allData || undefined)}</span>
               </div>
             </div>
           </div>
@@ -42,6 +63,11 @@ const Dashboard: React.FC = () => {
 
       {/* 主体内容 */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 移动端时间范围选择器 */}
+        <div className="mb-6 md:hidden">
+          <TimeRangeSelector value={timeRange} onChange={handleTimeRangeChange} />
+        </div>
+
         {/* 仪表板概览 */}
         <div className="mb-8">
           <div className="flex items-center space-x-2 mb-6">
@@ -109,16 +135,23 @@ const Dashboard: React.FC = () => {
             <div>
               <h4 className="font-medium text-gray-900 mb-2">数据来源</h4>
               <p>
-                基于2022年8月至2024年12月的个人收支流水记录，包含住房、餐饮、生活、娱乐等各类支出及收入数据。
+                基于个人收支流水记录，包含住房、餐饮、生活、娱乐等各类支出及收入数据。
               </p>
             </div>
             <div>
-              <h4 className="font-medium text-gray-900 mb-2">分析指标</h4>
+              <h4 className="font-medium ext-gray-900 mb-2">分析指标</h4>
               <p>
                 支出类别聚合分析、近三月消费趋势、月度收支对比、支出类别分布等多维度财务分析。
               </p>
             </div>
           </div>
+        </div>
+
+        {/* 数据更新尾注 */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500">
+            数据更新截止至：{latestDataDate || '数据加载中...'}
+          </p>
         </div>
       </main>
     </div>

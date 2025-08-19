@@ -17,9 +17,9 @@ interface ExpensePieChartProps {
   loading: boolean;
 }
 
-const ExpensePieChart: React.FC<ExpensePieChartProps> = ({ 
-  financialData, 
-  loading 
+const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
+  financialData,
+  loading,
 }) => {
   const chartRef = useRef<ChartJS<"doughnut">>(null);
 
@@ -44,14 +44,14 @@ const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
     );
   }
 
-  // 计算最新月份各类别支出总额
-  const latestRecord = financialData[financialData.length - 1];
-
   const categoryData = expenseCategories
     .map((category) => ({
       ...category,
       value: Math.abs(
-        latestRecord[category.key as keyof typeof latestRecord] as number
+        financialData.reduce((sum, record) => {
+          const categoryValue = record[category.key as keyof FinancialAggregationRecord];
+          return sum + (typeof categoryValue === 'number' ? categoryValue : 0);
+        }, 0)
       ),
     }))
     .filter((item) => item.value > 0);

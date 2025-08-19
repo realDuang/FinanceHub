@@ -83,4 +83,6 @@ export interface FinancialQuery {
   limit?: number;
   order_by?: string;
   order_direction?: "asc" | "desc";
+  start_date?: string;
+  end_date?: string;
 }

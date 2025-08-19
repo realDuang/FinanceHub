@@ -67,7 +67,7 @@ const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
     datasets: [
       {
         label: "近三月均匀消费支出",
-        data: financialData.map((record) =>
+        data: financialData.map((record) => 
           Math.abs(record.recent_avg_consumption)
         ),
         borderColor: "rgb(59, 130, 246)",

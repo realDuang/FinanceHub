@@ -50,24 +50,34 @@ export function useApi<T = any>(
 /**
  * 日期范围数据Hook
  */
-export function useGetFinancialAggregationRecords(options?: {
-  startDate: string | null;
-  endDate: string | null;
-}) {
-  const { startDate, endDate } = options || {};
-  return useApi(async () => {
-    let records = await api.getFinancialAggregationRecords();
-    if (startDate || endDate) {
-      records = records.filter((record) => {
-        const recordDate = new Date(record.month_date);
-        return (
-          (!startDate || recordDate >= new Date(startDate)) &&
-          (!endDate || recordDate <= new Date(endDate))
-        );
+export function useGetFinancialAggregationRecords(
+  startDate?: string | null,
+  endDate?: string | null
+) {
+  return useApi(
+    async () => {
+      return await api.getFinancialAggregationRecords({
+        start_date: startDate || undefined,
+        end_date: endDate || undefined,
       });
-    }
-    return records;
-  }, [options]);
+    },
+    [startDate, endDate]
+  );
+}
+
+/**
+ * 获取所有财务数据（用于计算日期范围）
+ */
+export function useGetAllFinancialRecords() {
+  return useApi(
+    async () => {
+      return await api.getFinancialAggregationRecords({
+        limit: 9999, // 获取所有数据
+      });
+    },
+    [],
+    { immediate: true }
+  );
 }
 
 /**

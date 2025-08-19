@@ -92,6 +92,11 @@ const Overview: React.FC<OverviewProps> = ({ financialData, loading }) => {
   const previousRecord = financialData[financialData.length - 2];
 
   const totalIncome = latestRecord.salary;
+  const incomeChange = (
+    ((latestRecord.salary - previousRecord.salary) / previousRecord.salary) *
+    100
+  ).toFixed(1);
+
   const totalExpenses = Math.abs(
     latestRecord.housing +
       latestRecord.dining +
@@ -101,31 +106,17 @@ const Overview: React.FC<OverviewProps> = ({ financialData, loading }) => {
       latestRecord.travel +
       latestRecord.gifts
   );
-
-  const incomeChange = (
-    ((latestRecord.salary - previousRecord.salary) / previousRecord.salary) *
-    100
-  ).toFixed(1);
+  const previousExpense = Math.abs(
+    previousRecord.housing +
+      previousRecord.dining +
+      previousRecord.living +
+      previousRecord.entertainment +
+      previousRecord.transportation +
+      previousRecord.travel +
+      previousRecord.gifts
+  );
   const expenseChange = (
-    ((totalExpenses -
-      Math.abs(
-        previousRecord.housing +
-          previousRecord.dining +
-          previousRecord.living +
-          previousRecord.entertainment +
-          previousRecord.transportation +
-          previousRecord.travel +
-          previousRecord.gifts
-      )) /
-      Math.abs(
-        previousRecord.housing +
-          previousRecord.dining +
-          previousRecord.living +
-          previousRecord.entertainment +
-          previousRecord.transportation +
-          previousRecord.travel +
-          previousRecord.gifts
-      )) *
+    ((totalExpenses - previousExpense) / previousExpense) *
     100
   ).toFixed(1);
 
@@ -161,12 +152,11 @@ const Overview: React.FC<OverviewProps> = ({ financialData, loading }) => {
         icon={<TrendingUp className="w-6 h-6" />}
       />
       <StatCard
-        title="月均支出"
+        title="均匀消费支出"
         value={`¥${Math.abs(latestRecord.avg_consumption).toLocaleString()}`}
         change={`${(
-          ((Math.abs(latestRecord.avg_consumption) -
-            Math.abs(previousRecord.avg_consumption)) /
-            Math.abs(previousRecord.avg_consumption)) *
+          ((latestRecord.avg_consumption - previousRecord.avg_consumption) /
+            previousRecord.avg_consumption) *
           100
         ).toFixed(1)}%`}
         changeType={

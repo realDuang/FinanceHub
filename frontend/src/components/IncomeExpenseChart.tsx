@@ -73,9 +73,7 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
         record.entertainment +
         record.transportation +
         record.travel +
-        record.gifts +
-        record.social_expenses +
-        record.transactions
+        record.gifts
     );
   });
 

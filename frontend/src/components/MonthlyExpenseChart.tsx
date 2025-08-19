@@ -65,8 +65,8 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
 
   const datasets = expenseCategories.map((category) => ({
     label: category.label,
-    data: financialData.map((record) =>
-      Math.abs(record[category.key as keyof typeof record] as number)
+    data: financialData.map(
+      (record) => record[category.key as keyof typeof record] as number
     ),
     backgroundColor: category.color,
     borderColor: category.color,
