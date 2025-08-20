@@ -1,10 +1,11 @@
 import React, { useState, useMemo } from "react";
-import { BarChart3, PieChart, TrendingUp, Wallet } from "lucide-react";
+import { BarChart3, PieChart, TrendingUp, Wallet, Table } from "lucide-react";
 import Overview from "../components/Overview";
 import MonthlyExpenseChart from "../components/MonthlyExpenseChart";
 import TrendChart from "../components/TrendChart";
 import ExpensePieChart from "../components/ExpensePieChart";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
+import FinancialDataTable from "../components/FinancialDataTable";
 import TimeRangeSelector, { TimeRange } from "../components/TimeRangeSelector";
 import { useGetFinancialAggregationRecords, useGetAllFinancialRecords } from "../hooks/useApi";
 import { getDateRangeFromTimeRange, formatDateRangeText, getLatestDataDate } from "../utils/date-utils";
@@ -123,6 +124,18 @@ const Dashboard: React.FC = () => {
             </div>
             <IncomeExpenseChart
               financialData={financialData}
+              loading={loading}
+            />
+          </div>
+
+          {/* 财务数据明细表 */}
+          <div>
+            <div className="flex items-center space-x-2 mb-4">
+              <Table className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-lg font-semibold text-gray-900">财务数据明细</h3>
+            </div>
+            <FinancialDataTable
+              data={financialData || []}
               loading={loading}
             />
           </div>
