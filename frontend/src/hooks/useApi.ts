@@ -81,6 +81,22 @@ export function useGetAllFinancialRecords() {
 }
 
 /**
+ * 搜索交易详情Hook
+ */
+export function useSearchTransactionDetails(
+  filterQuery: any = {},
+  immediate: boolean = true
+) {
+  return useApi(
+    async () => {
+      return await api.searchTransactionDetails(filterQuery);
+    },
+    [JSON.stringify(filterQuery)],
+    { immediate }
+  );
+}
+
+/**
  * 健康检查Hook
  */
 export function useHealthCheck() {

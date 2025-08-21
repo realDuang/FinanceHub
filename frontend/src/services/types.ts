@@ -1,5 +1,3 @@
-import { IncomeExpenseType, PaymentMethod, TransactionType } from "./constants";
-
 export interface RequestOptions {
   method?: string;
   headers?: Record<string, string>;
@@ -9,10 +7,10 @@ export interface RequestOptions {
 // 交易记录相关接口
 export interface TransactionDetailBase {
   transaction_time: string;
-  category: TransactionType;
+  category: string;  // 改为字符串类型，接受中文值
   amount: number;
-  income_expense_type: IncomeExpenseType;
-  payment_method?: PaymentMethod;
+  income_expense_type: string;  // 改为字符串类型，接受中文值
+  payment_method?: string;  // 改为字符串类型，接受中文值
   counterparty?: string;
   item_name?: string;
   remarks?: string;
@@ -28,9 +26,9 @@ export interface TransactionDetail extends TransactionDetailBase {
 export interface TransactionFilterQuery {
   start_date?: string;
   end_date?: string;
-  categories?: TransactionType[];
-  income_expense_types?: IncomeExpenseType[];
-  payment_methods?: PaymentMethod[];
+  categories?: string[];  // 改为字符串数组
+  income_expense_types?: string[];  // 改为字符串数组
+  payment_methods?: string[];  // 改为字符串数组
   counterparties?: string[];
   min_amount?: number;
   max_amount?: number;

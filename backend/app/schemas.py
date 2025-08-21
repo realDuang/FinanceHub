@@ -41,10 +41,10 @@ class TransactionDetailBase(BaseModel):
     """交易明细基础模型"""
 
     transaction_time: datetime
-    category: TransactionType
+    category: str  # 改为字符串类型，接受中文值
     amount: float
-    income_expense_type: IncomeExpenseType
-    payment_method: Optional[PaymentMethod] = None
+    income_expense_type: str  # 改为字符串类型，接受中文值
+    payment_method: Optional[str] = None  # 改为字符串类型，接受中文值
     counterparty: Optional[str] = None
     item_name: Optional[str] = None
     remarks: Optional[str] = None
@@ -67,9 +67,9 @@ class TransactionFilterQuery(BaseModel):
 
     start_date: Optional[str] = None
     end_date: Optional[str] = None
-    categories: Optional[List[TransactionType]] = None
-    income_expense_types: Optional[List[IncomeExpenseType]] = None
-    payment_methods: Optional[List[PaymentMethod]] = None
+    categories: Optional[List[str]] = None  # 改为字符串列表
+    income_expense_types: Optional[List[str]] = None  # 改为字符串列表
+    payment_methods: Optional[List[str]] = None  # 改为字符串列表
     counterparties: Optional[List[str]] = None
     min_amount: Optional[float] = None
     max_amount: Optional[float] = None

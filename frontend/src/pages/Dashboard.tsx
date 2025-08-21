@@ -1,34 +1,69 @@
 import React, { useState, useMemo } from "react";
-import { BarChart3, PieChart, TrendingUp, Wallet, Table } from "lucide-react";
+import {
+  BarChart3,
+  PieChart,
+  TrendingUp,
+  Wallet,
+  Table,
+  FileText,
+} from "lucide-react";
 import Overview from "../components/Overview";
 import MonthlyExpenseChart from "../components/MonthlyExpenseChart";
 import TrendChart from "../components/TrendChart";
 import ExpensePieChart from "../components/ExpensePieChart";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
 import FinancialDataTable from "../components/FinancialDataTable";
+import TransactionDetailTable from "../components/TransactionDetailTable";
 import TimeRangeSelector, { TimeRange } from "../components/TimeRangeSelector";
-import { useGetFinancialAggregationRecords, useGetAllFinancialRecords } from "../hooks/useApi";
-import { getDateRangeFromTimeRange, formatDateRangeText, getLatestDataDate } from "../utils/date-utils";
+import {
+  useGetFinancialAggregationRecords,
+  useGetAllFinancialRecords,
+  useSearchTransactionDetails,
+} from "../hooks/useApi";
+import {
+  getDateRangeFromTimeRange,
+  formatDateRangeText,
+  getLatestDataDate,
+} from "../utils/date-utils";
 
 /**
  * 财务管理仪表板
  */
 const Dashboard: React.FC = () => {
-  const [timeRange, setTimeRange] = useState<TimeRange>('all');
-  
+  const [timeRange, setTimeRange] = useState<TimeRange>("all");
+  const [activeTab, setActiveTab] = useState<"overview" | "transactions">(
+    "overview"
+  );
+
   // 获取所有数据用于计算日期范围
   const { data: allData } = useGetAllFinancialRecords();
-  
+
   // 根据时间范围计算日期
-  const dateRange = useMemo(() => getDateRangeFromTimeRange(timeRange, allData || undefined), [timeRange, allData]);
-  
+  const dateRange = useMemo(
+    () => getDateRangeFromTimeRange(timeRange, allData || undefined),
+    [timeRange, allData]
+  );
+
   // 计算最新数据的截止时间
-  const latestDataDate = useMemo(() => getLatestDataDate(allData || undefined), [allData]);
-  
+  const latestDataDate = useMemo(
+    () => getLatestDataDate(allData || undefined),
+    [allData]
+  );
+
   const { data: financialData, loading } = useGetFinancialAggregationRecords(
     dateRange.startDate,
     dateRange.endDate
   );
+
+  // 获取交易详情数据
+  const { data: transactionData, loading: transactionLoading } =
+    useSearchTransactionDetails({
+      start_date: dateRange.startDate,
+      end_date: dateRange.endDate,
+      limit: 99999,
+      order_by: "transaction_time",
+      order_direction: "asc",  // 修改为增序排列
+    });
 
   const handleTimeRangeChange = (newTimeRange: TimeRange) => {
     setTimeRange(newTimeRange);
@@ -52,10 +87,16 @@ const Dashboard: React.FC = () => {
               </div>
             </div>
             <div className="hidden md:flex items-center space-x-4">
-              <TimeRangeSelector value={timeRange} onChange={handleTimeRangeChange} />
+              <TimeRangeSelector
+                value={timeRange}
+                onChange={handleTimeRangeChange}
+              />
               <div className="flex items-center space-x-2 text-sm text-gray-600">
                 <BarChart3 className="w-4 h-4" />
-                <span>数据范围: {formatDateRangeText(timeRange, allData || undefined)}</span>
+                <span>
+                  数据范围:{" "}
+                  {formatDateRangeText(timeRange, allData || undefined)}
+                </span>
               </div>
             </div>
           </div>
@@ -66,80 +107,146 @@ const Dashboard: React.FC = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* 移动端时间范围选择器 */}
         <div className="mb-6 md:hidden">
-          <TimeRangeSelector value={timeRange} onChange={handleTimeRangeChange} />
+          <TimeRangeSelector
+            value={timeRange}
+            onChange={handleTimeRangeChange}
+          />
         </div>
 
-        {/* 仪表板概览 */}
+        {/* Tab 导航 */}
         <div className="mb-8">
-          <div className="flex items-center space-x-2 mb-6">
-            <TrendingUp className="w-5 h-5 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-900">财务概览</h2>
-          </div>
-          <Overview financialData={financialData} loading={loading} />
-        </div>
-
-        {/* 图表区域 */}
-        <div className="space-y-8">
-          {/* 月度支出分析 */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <BarChart3 className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                月度支出分析
-              </h3>
-            </div>
-            <MonthlyExpenseChart
-              financialData={financialData}
-              loading={loading}
-            />
-          </div>
-
-          {/* 消费趋势分析 */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <TrendingUp className="w-5 h-5 text-green-600" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                消费趋势分析
-              </h3>
-            </div>
-            <TrendChart financialData={financialData} loading={loading} />
-          </div>
-
-          {/* 支出类别分布 */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <PieChart className="w-5 h-5 text-purple-600" />
-              <h3 className="text-lg font-semibold text-gray-900">
-                支出类别分布
-              </h3>
-            </div>
-            <ExpensePieChart financialData={financialData} loading={loading} />
-          </div>
-
-          {/* 收支对比 */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Wallet className="w-5 h-5 text-blue-600" />
-              <h3 className="text-lg font-semibold text-gray-900">收支对比</h3>
-            </div>
-            <IncomeExpenseChart
-              financialData={financialData}
-              loading={loading}
-            />
-          </div>
-
-          {/* 财务数据明细表 */}
-          <div>
-            <div className="flex items-center space-x-2 mb-4">
-              <Table className="w-5 h-5 text-indigo-600" />
-              <h3 className="text-lg font-semibold text-gray-900">财务数据明细</h3>
-            </div>
-            <FinancialDataTable
-              data={financialData || []}
-              loading={loading}
-            />
+          <div className="border-b border-gray-200">
+            <nav className="-mb-px flex space-x-8">
+              <button
+                onClick={() => setActiveTab("overview")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "overview"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <TrendingUp className="w-4 h-4" />
+                  <span>财务概览</span>
+                </div>
+              </button>
+              <button
+                onClick={() => setActiveTab("transactions")}
+                className={`py-2 px-1 border-b-2 font-medium text-sm ${
+                  activeTab === "transactions"
+                    ? "border-blue-500 text-blue-600"
+                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                }`}
+              >
+                <div className="flex items-center space-x-2">
+                  <FileText className="w-4 h-4" />
+                  <span>交易明细</span>
+                </div>
+              </button>
+            </nav>
           </div>
         </div>
+
+        {/* Tab 内容区域 */}
+        {activeTab === "overview" && (
+          <>
+            {/* 仪表板概览 */}
+            <div className="mb-8">
+              <div className="flex items-center space-x-2 mb-6">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
+                <h2 className="text-lg font-semibold text-gray-900">
+                  财务概览
+                </h2>
+              </div>
+              <Overview financialData={financialData} loading={loading} />
+            </div>
+
+            {/* 图表区域 */}
+            <div className="space-y-8">
+              {/* 月度支出分析 */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    月度支出分析
+                  </h3>
+                </div>
+                <MonthlyExpenseChart
+                  financialData={financialData}
+                  loading={loading}
+                />
+              </div>
+
+              {/* 消费趋势分析 */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <TrendingUp className="w-5 h-5 text-green-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    消费趋势分析
+                  </h3>
+                </div>
+                <TrendChart financialData={financialData} loading={loading} />
+              </div>
+
+              {/* 支出类别分布 */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <PieChart className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    支出类别分布
+                  </h3>
+                </div>
+                <ExpensePieChart
+                  financialData={financialData}
+                  loading={loading}
+                />
+              </div>
+
+              {/* 收支对比 */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <Wallet className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    收支对比
+                  </h3>
+                </div>
+                <IncomeExpenseChart
+                  financialData={financialData}
+                  loading={loading}
+                />
+              </div>
+
+              {/* 财务数据明细表 */}
+              <div>
+                <div className="flex items-center space-x-2 mb-4">
+                  <Table className="w-5 h-5 text-indigo-600" />
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    财务数据明细
+                  </h3>
+                </div>
+                <FinancialDataTable
+                  data={financialData || []}
+                  loading={loading}
+                />
+              </div>
+            </div>
+          </>
+        )}
+
+        {activeTab === "transactions" && (
+          <div>
+            <div className="flex items-center space-x-2 mb-6">
+              <FileText className="w-5 h-5 text-blue-600" />
+              <h2 className="text-lg font-semibold text-gray-900">
+                交易详情明细
+              </h2>
+            </div>
+            <TransactionDetailTable
+              data={transactionData?.records || []}
+              loading={transactionLoading}
+            />
+          </div>
+        )}
 
         {/* 数据说明 */}
         <div className="mt-12 bg-white rounded-xl shadow-lg p-6">
@@ -163,7 +270,7 @@ const Dashboard: React.FC = () => {
         {/* 数据更新尾注 */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-500">
-            数据更新截止至：{latestDataDate || '数据加载中...'}
+            数据更新截止至：{latestDataDate || "数据加载中..."}
           </p>
         </div>
       </main>
