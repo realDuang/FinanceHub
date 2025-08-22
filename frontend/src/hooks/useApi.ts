@@ -54,15 +54,12 @@ export function useGetFinancialAggregationRecords(
   startDate?: string | null,
   endDate?: string | null
 ) {
-  return useApi(
-    async () => {
-      return await api.getFinancialAggregationRecords({
-        start_date: startDate || undefined,
-        end_date: endDate || undefined,
-      });
-    },
-    [startDate, endDate]
-  );
+  return useApi(async () => {
+    return await api.getFinancialAggregationRecords({
+      start_date: startDate || undefined,
+      end_date: endDate || undefined,
+    });
+  }, [startDate, endDate]);
 }
 
 /**
@@ -72,7 +69,7 @@ export function useGetAllFinancialRecords() {
   return useApi(
     async () => {
       return await api.getFinancialAggregationRecords({
-        limit: 9999, // 获取所有数据
+        limit: 9999,
       });
     },
     [],
@@ -89,7 +86,10 @@ export function useSearchTransactionDetails(
 ) {
   return useApi(
     async () => {
-      return await api.searchTransactionDetails(filterQuery);
+      return await api.searchTransactionDetails({
+        ...filterQuery,
+        limit: 99999,
+      });
     },
     [JSON.stringify(filterQuery)],
     { immediate }

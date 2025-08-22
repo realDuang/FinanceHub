@@ -30,7 +30,7 @@ class FinancialAggregation(Base):
     __tablename__ = "financial_aggregation"
 
     id = Column(Integer, primary_key=True, index=True)
-    month_date = Column(String, nullable=False, index=True)  # 月度日期，如 "2022/8/1"
+    month_date = Column(DateTime, nullable=False, index=True)  # 月度日期时间戳
     housing = Column(Float, default=0.0)  # 住房
     dining = Column(Float, default=0.0)  # 餐饮
     living = Column(Float, default=0.0)  # 生活

@@ -103,7 +103,7 @@ class TransactionFilterResult(BaseModel):
 class FinancialAggregationBase(BaseModel):
     """财务聚合记录基础模型"""
 
-    month_date: str
+    month_date: datetime  # 改为 datetime 类型
     housing: float = 0.0
     dining: float = 0.0
     living: float = 0.0

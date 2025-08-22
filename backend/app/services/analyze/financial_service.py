@@ -43,14 +43,10 @@ class FinancialService:
             filtered_records = []
             for record in all_records:
                 try:
-                    # 解析数据库中的日期格式 "YYYY/M/D"
-                    record_date = datetime.strptime(record.month_date, "%Y/%m/%d")
-                except ValueError:
-                    # 如果解析失败，尝试其他格式
-                    try:
-                        record_date = datetime.strptime(record.month_date, "%Y/%m/%d")
-                    except ValueError:
-                        continue
+                    # record.month_date 现在是 DateTime 对象
+                    record_date = record.month_date
+                except Exception:
+                    continue
 
                 # 检查日期范围
                 include_record = True
@@ -71,15 +67,15 @@ class FinancialService:
 
         # 排序处理
         if order_by == "month_date":
-            # 按日期排序
+            # 按日期排序 - month_date 现在是 DateTime 对象
             if order_direction.lower() == "desc":
                 all_records.sort(
-                    key=lambda x: datetime.strptime(x.month_date, "%Y/%m/%d"),
+                    key=lambda x: x.month_date,
                     reverse=True,
                 )
             else:
                 all_records.sort(
-                    key=lambda x: datetime.strptime(x.month_date, "%Y/%m/%d")
+                    key=lambda x: x.month_date
                 )
         else:
             # 其他字段排序

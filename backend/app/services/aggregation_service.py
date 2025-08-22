@@ -116,8 +116,8 @@ class AggregationService:
                     db, year_val, month_val, category_mapping, financial_fields
                 )
 
-                # 构建月度日期字符串
-                month_date = f"{year_val}/{month_val}/1"
+                # 构建月度日期DateTime对象 (每月1号)
+                month_date = datetime(year_val, month_val, 1)
 
                 # 查找是否已存在该月的记录
                 existing_record = (
@@ -146,11 +146,13 @@ class AggregationService:
 
             # 提交第一阶段的更改
             db.commit()
-            
+
             # 第二阶段：更新avg_consumption和recent_avg_consumption字段
             print("🔄 开始第二阶段：更新avg_consumption和recent_avg_consumption...")
-            second_stage_updated_records = cls._update_derived_consumption_fields(db, year, month)
-            
+            second_stage_updated_records = cls._update_derived_consumption_fields(
+                db, year, month
+            )
+
             # 提交第二阶段的更改
             db.commit()
 
@@ -268,7 +270,9 @@ class AggregationService:
         return aggregated_data
 
     @classmethod
-    def _update_derived_consumption_fields(cls, db: Session, year: int = None, month: int = None) -> int:
+    def _update_derived_consumption_fields(
+        cls, db: Session, year: int = None, month: int = None
+    ) -> int:
         """
         第二阶段：更新所有记录的avg_consumption和recent_avg_consumption字段
         基于已聚合完成的基础数据计算这两个派生字段
@@ -283,77 +287,90 @@ class AggregationService:
         """
         try:
             print("🔄 开始第二阶段：更新派生的消费字段...")
-            
+
             # 构建查询条件
             query = db.query(FinancialAggregation)
-            
+
             if year and month:
                 # 如果指定了年月，只更新特定月份
-                month_date = f"{year}/{month}/1"
+                from datetime import datetime
+
+                month_date = datetime(year, month, 1)
                 query = query.filter(FinancialAggregation.month_date == month_date)
             elif year:
                 # 如果只指定年份，更新该年份的所有月份
-                query = query.filter(FinancialAggregation.month_date.like(f"{year}/%"))
-            
+                from sqlalchemy import extract
+
+                query = query.filter(
+                    extract("year", FinancialAggregation.month_date) == year
+                )
+
             records = query.order_by(FinancialAggregation.month_date).all()
-            
+
             # 第一步：计算住房支出平均值（基于已聚合的数据）
-            avg_housing_expense = cls._calculate_housing_average_from_aggregated_data(db)
+            avg_housing_expense = cls._calculate_housing_average_from_aggregated_data(
+                db
+            )
             print(f"🏠 从聚合数据计算住房支出平均值: {avg_housing_expense}")
-            
+
             updated_count = 0
-            
+
             # 第二步：更新每条记录的avg_consumption
             for record in records:
                 try:
-                    parts = record.month_date.split('/')
-                    record_year = int(parts[0])
-                    record_month = int(parts[1])
-                    
+                    # month_date 现在是 DateTime 对象
+                    record_year = record.month_date.year
+                    record_month = record.month_date.month
+
                     # 计算该记录的avg_consumption
                     avg_consumption = cls._calculate_avg_consumption_from_record(
                         record, avg_housing_expense
                     )
-                    
+
                     # 更新记录
                     record.avg_consumption = avg_consumption
-                    print(f"✅ 更新 {record_year}/{record_month} 的avg_consumption: {avg_consumption}")
-                    
-                except (ValueError, IndexError) as e:
-                    print(f"⚠️ 解析月份日期失败: {record.month_date}, 错误: {e}")
+                    print(
+                        f"✅ 更新 {record_year}/{record_month} 的avg_consumption: {avg_consumption}"
+                    )
+
+                except Exception as e:
+                    print(f"⚠️ 处理记录失败: {record.month_date}, 错误: {e}")
                     continue
-            
+
             # 先提交avg_consumption的更新
             db.commit()
-            
+
             # 第三步：更新每条记录的recent_avg_consumption
             for record in records:
                 try:
-                    parts = record.month_date.split('/')
-                    record_year = int(parts[0])
-                    record_month = int(parts[1])
-                    
+                    # month_date 现在是 DateTime 对象
+                    record_year = record.month_date.year
+                    record_month = record.month_date.month
+
                     # 计算该记录的recent_avg_consumption
                     recent_avg = cls._calculate_recent_avg_consumption(
                         db, record_year, record_month, record.avg_consumption
                     )
-                    
+
                     # 更新记录
                     record.recent_avg_consumption = recent_avg
                     updated_count += 1
-                    
-                    print(f"✅ 更新 {record_year}/{record_month} 的recent_avg_consumption: {recent_avg}")
-                    
-                except (ValueError, IndexError) as e:
-                    print(f"⚠️ 解析月份日期失败: {record.month_date}, 错误: {e}")
+
+                    print(
+                        f"✅ 更新 {record_year}/{record_month} 的recent_avg_consumption: {recent_avg}"
+                    )
+
+                except Exception as e:
+                    print(f"⚠️ 处理记录失败: {record.month_date}, 错误: {e}")
                     continue
-            
+
             print(f"📊 完成派生字段更新，共更新 {updated_count} 条记录")
             return updated_count
-            
+
         except Exception as e:
             print(f"❌ 更新派生字段失败: {str(e)}")
             import traceback
+
             print(f"🔍 详细错误信息:\n{traceback.format_exc()}")
             return 0
 
@@ -361,79 +378,89 @@ class AggregationService:
     def _calculate_housing_average_from_aggregated_data(cls, db: Session) -> float:
         """
         从已聚合的数据计算住房支出平均值
-        
+
         Args:
             db: 数据库会话
-            
+
         Returns:
             住房支出平均值
         """
         try:
             # 获取所有记录的总月份数
             total_months_count = db.query(FinancialAggregation).count()
-            
+
             if total_months_count == 0:
                 print("📊 未找到任何聚合记录")
                 return 0.0
-            
+
             # 获取所有住房支出数据
             housing_records = db.query(FinancialAggregation.housing).all()
-            
+
             # 计算住房支出总额（只取负值，即实际支出）
             total_housing_expense = 0.0
             for record in housing_records:
                 housing_amount = record.housing if record.housing is not None else 0.0
                 if housing_amount < 0:  # 支出为负值
                     total_housing_expense += abs(housing_amount)
-            
+
             # 用所有月份数计算平均值
-            avg_housing = total_housing_expense / total_months_count if total_months_count > 0 else 0.0
-            
+            avg_housing = (
+                total_housing_expense / total_months_count
+                if total_months_count > 0
+                else 0.0
+            )
+
             print(f"🏠 住房支出统计:")
             print(f"   - 总月份数: {total_months_count}")
             print(f"   - 住房支出总额: {total_housing_expense}")
             print(f"   - 住房支出平均值: {avg_housing}")
-            
+
             return avg_housing
-            
+
         except Exception as e:
             print(f"❌ 从聚合数据计算住房平均值失败: {str(e)}")
             return 0.0
 
     @classmethod
-    def _calculate_avg_consumption_from_record(cls, record: FinancialAggregation, avg_housing_expense: float) -> float:
+    def _calculate_avg_consumption_from_record(
+        cls, record: FinancialAggregation, avg_housing_expense: float
+    ) -> float:
         """
         根据聚合记录计算avg_consumption
         avg_consumption = 当月除住房和人情外的所有支出 + 住房支出平均值
-        
+
         Args:
             record: 财务聚合记录
             avg_housing_expense: 住房支出平均值
-            
+
         Returns:
             平均消费金额
         """
         try:
             # 计算当月除住房和人情外的所有支出
             current_month_consumption = 0.0
-            
+
             # 包含的支出类别
             included_categories = [
-                'dining', 'living', 'entertainment', 
-                'transportation', 'travel', 'gifts'
+                "dining",
+                "living",
+                "entertainment",
+                "transportation",
+                "travel",
+                "gifts",
             ]
-            
+
             for category in included_categories:
                 if hasattr(record, category):
                     field_value = getattr(record, category, 0.0)
                     if field_value is not None and field_value < 0:  # 支出为负值
                         current_month_consumption += abs(field_value)
-            
+
             # 最终的avg_consumption = 当月消费 + 住房平均值
             avg_consumption = current_month_consumption + avg_housing_expense
-            
+
             return avg_consumption
-            
+
         except Exception as e:
             print(f"❌ 计算avg_consumption失败: {str(e)}")
             return 0.0
@@ -461,29 +488,37 @@ class AggregationService:
 
             # 构建当前月份的日期
             current_date = datetime(year, month, 1)
-            
+
             # 收集最近三个月的avg_consumption（包括当前月份）
             recent_avg_consumptions = [current_month_avg]  # 当前月份 (n)
-            
+
             print(f"📊 计算 {year}/{month} 的recent_avg_consumption")
             print(f"📊 当前月份avg_consumption: {current_month_avg}")
-            
+
             # 查询过去两个月的记录 (n-1, n-2)
             for i in range(1, 3):  # 查询过去2个月
                 past_date = current_date - relativedelta(months=i)
-                past_month_date = f"{past_date.year}/{past_date.month}/1"
-                
+                past_month_date = datetime(past_date.year, past_date.month, 1)
+
                 record = (
                     db.query(FinancialAggregation)
                     .filter(FinancialAggregation.month_date == past_month_date)
                     .first()
                 )
 
-                if record and record.avg_consumption is not None and record.avg_consumption > 0:
+                if (
+                    record
+                    and record.avg_consumption is not None
+                    and record.avg_consumption > 0
+                ):
                     recent_avg_consumptions.append(record.avg_consumption)
-                    print(f"📊 找到 {past_date.year}/{past_date.month} 的avg_consumption: {record.avg_consumption}")
+                    print(
+                        f"📊 找到 {past_date.year}/{past_date.month} 的avg_consumption: {record.avg_consumption}"
+                    )
                 else:
-                    print(f"📊 未找到 {past_date.year}/{past_date.month} 的有效avg_consumption数据")
+                    print(
+                        f"📊 未找到 {past_date.year}/{past_date.month} 的有效avg_consumption数据"
+                    )
 
             # 计算平均值
             if len(recent_avg_consumptions) > 0:
@@ -491,7 +526,9 @@ class AggregationService:
             else:
                 recent_avg = current_month_avg  # 如果没有历史数据，使用当前月份的值
 
-            print(f"📊 使用 {len(recent_avg_consumptions)} 个月的数据: {recent_avg_consumptions}")
+            print(
+                f"📊 使用 {len(recent_avg_consumptions)} 个月的数据: {recent_avg_consumptions}"
+            )
             print(f"📊 计算结果recent_avg_consumption: {recent_avg}")
 
             return recent_avg
@@ -499,18 +536,19 @@ class AggregationService:
         except Exception as e:
             print(f"❌ 计算recent_avg_consumption失败: {str(e)}")
             import traceback
+
             print(f"🔍 详细错误信息:\n{traceback.format_exc()}")
             return current_month_avg  # 出错时返回当前月份的值
 
     @classmethod
     def _create_financial_record(
-        cls, month_date: str, month_data: Dict, financial_fields: set
+        cls, month_date: datetime, month_data: Dict, financial_fields: set
     ) -> FinancialAggregation:
         """
         动态创建财务记录
 
         Args:
-            month_date: 月份日期字符串
+            month_date: 月份日期DateTime对象
             month_data: 月度数据
             financial_fields: 可用的财务字段集合
         """

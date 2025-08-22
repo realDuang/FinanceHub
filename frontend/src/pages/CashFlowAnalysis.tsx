@@ -29,6 +29,8 @@ import {
   getDateRangeFromTimeRange,
   formatDateRangeText,
   getLatestDataDate,
+  getAvailableMonthRange,
+  getAvailableYears,
 } from "../utils/date-utils";
 
 /**
@@ -40,15 +42,16 @@ const CashFlowAnalysis: React.FC = () => {
     "overview"
   );
   const [isImportExportModalOpen, setIsImportExportModalOpen] = useState(false);
-  const [importExportModalDefaultTab, setImportExportModalDefaultTab] = useState<"import" | "export">("import");
+  const [importExportModalDefaultTab, setImportExportModalDefaultTab] =
+    useState<"import" | "export">("import");
 
   // 获取所有数据用于计算日期范围
   const { data: allData } = useGetAllFinancialRecords();
 
   // 根据时间范围计算日期
   const dateRange = useMemo(
-    () => getDateRangeFromTimeRange(timeRange, allData || undefined),
-    [timeRange, allData]
+    () => getDateRangeFromTimeRange(timeRange),
+    [timeRange]
   );
 
   // 计算最新数据的截止时间
@@ -57,10 +60,14 @@ const CashFlowAnalysis: React.FC = () => {
     [allData]
   );
 
-  const { data: financialData, loading, refetch: refetchFinancialData } = useGetFinancialAggregationRecords(
-    dateRange.startDate,
-    dateRange.endDate
-  );
+  const availableYears = getAvailableYears(allData || undefined);
+  const availableMonthRange = getAvailableMonthRange(allData || undefined);
+
+  const {
+    data: financialData,
+    loading,
+    refetch: refetchFinancialData,
+  } = useGetFinancialAggregationRecords(dateRange.startDate, dateRange.endDate);
 
   // 获取交易详情数据
   const {
@@ -70,7 +77,6 @@ const CashFlowAnalysis: React.FC = () => {
   } = useSearchTransactionDetails({
     start_date: dateRange.startDate,
     end_date: dateRange.endDate,
-    limit: 99999,
     order_by: "transaction_time",
     order_direction: "asc", // 修改为增序排列
   });
@@ -87,7 +93,10 @@ const CashFlowAnalysis: React.FC = () => {
 
   // 判断是否有数据
   const hasFinancialData = financialData && financialData.length > 0;
-  const hasTransactionData = transactionData && transactionData.records && transactionData.records.length > 0;
+  const hasTransactionData =
+    transactionData &&
+    transactionData.records &&
+    transactionData.records.length > 0;
 
   const handleOpenImportModal = () => {
     setImportExportModalDefaultTab("import");
@@ -112,10 +121,7 @@ const CashFlowAnalysis: React.FC = () => {
               </h1>
               <p className="text-gray-600 flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
-                <span>
-                  数据范围:{" "}
-                  {formatDateRangeText(timeRange, allData || undefined)}
-                </span>
+                <span>数据范围: {formatDateRangeText(timeRange)}</span>
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
@@ -136,13 +142,14 @@ const CashFlowAnalysis: React.FC = () => {
                   <span>导出</span>
                 </button>
               </div>
-              
+
               <div className="w-px h-8 bg-gray-300 hidden sm:block"></div>
-              
+
               <TimeRangeSelector
                 value={timeRange}
                 onChange={handleTimeRangeChange}
-                allData={allData || undefined}
+                availableYears={availableYears}
+                availableMonthRange={availableMonthRange}
               />
             </div>
           </div>
@@ -196,7 +203,9 @@ const CashFlowAnalysis: React.FC = () => {
                   <div className="text-gray-400 mb-4">
                     <BarChart3 className="w-16 h-16 mx-auto" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">暂无财务数据</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    暂无财务数据
+                  </h3>
                   <p className="text-gray-500 mb-6">
                     请先导入交易数据以生成财务分析报表
                   </p>
@@ -246,7 +255,10 @@ const CashFlowAnalysis: React.FC = () => {
                         消费趋势分析
                       </h3>
                     </div>
-                    <TrendChart financialData={financialData} loading={loading} />
+                    <TrendChart
+                      financialData={financialData}
+                      loading={loading}
+                    />
                   </div>
 
                   {/* 支出类别分布 */}
@@ -306,7 +318,7 @@ const CashFlowAnalysis: React.FC = () => {
                 </h2>
               </div>
             </div>
-            
+
             {transactionLoading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
@@ -318,7 +330,9 @@ const CashFlowAnalysis: React.FC = () => {
                   <div className="text-gray-400 mb-4">
                     <FileText className="w-16 h-16 mx-auto" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">暂无交易数据</h3>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">
+                    暂无交易数据
+                  </h3>
                   <p className="text-gray-500 mb-6">
                     请导入CSV格式的交易数据文件来查看详细交易记录
                   </p>
@@ -348,7 +362,9 @@ const CashFlowAnalysis: React.FC = () => {
         {/* 数据说明 - 只在有数据时显示 */}
         {(hasFinancialData || hasTransactionData) && (
           <div className="mt-12 bg-white rounded-xl shadow-lg p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">报表说明</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">
+              报表说明
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-gray-600">
               <div>
                 <h4 className="font-medium text-gray-900 mb-2">数据来源</h4>
