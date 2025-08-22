@@ -1,12 +1,12 @@
 export interface AssetItem {
-  id: string;
+  id?: number;
   name: string;
   value: number;
   category: "current" | "non-current";
 }
 
 export interface LiabilityItem {
-  id: string;
+  id?: number;
   name: string;
   value: number;
   category: "current" | "non-current";

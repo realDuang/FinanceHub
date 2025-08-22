@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import router
+from app.database.connection import create_tables
 import os
 
 # 创建FastAPI应用实例
@@ -20,6 +21,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 创建数据库表
+create_tables()
+
 # 包含API路由
 app.include_router(router, prefix="/api/v1", tags=["财务管理"])
 

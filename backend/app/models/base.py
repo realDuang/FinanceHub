@@ -13,13 +13,9 @@ class TransactionDetail(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     transaction_time = Column(DateTime, nullable=False, index=True)  # 交易时间
-    category = Column(
-        String(15), nullable=False, index=True
-    )  # 类型 (住房、餐饮等)
+    category = Column(String(15), nullable=False, index=True)  # 类型 (住房、餐饮等)
     amount = Column(Float, nullable=False)  # 金额
-    income_expense_type = Column(
-        String(7), nullable=False, index=True
-    )  # 收/支
+    income_expense_type = Column(String(7), nullable=False, index=True)  # 收/支
     payment_method = Column(String(13), nullable=True)  # 支付方式
     counterparty = Column(String(200), nullable=True)  # 交易对方
     item_name = Column(String(500), nullable=True)  # 商品名称
@@ -48,5 +44,35 @@ class FinancialAggregation(Base):
     balance = Column(Float, default=0.0)  # 结余
     avg_consumption = Column(Float, default=0.0)  # 均匀消费支出(房租均摊)
     recent_avg_consumption = Column(Float, default=0.0)  # 近三月均匀消费支出
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
+class Asset(Base):
+    """资产模型"""
+
+    __tablename__ = "assets"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(200), nullable=False)  # 资产名称
+    value = Column(Float, nullable=False)  # 资产价值
+    category = Column(
+        String(20), nullable=False, index=True
+    )  # 资产类别: current/non-current
+    created_at = Column(DateTime, default=datetime.now)
+    updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+
+class Liability(Base):
+    """负债模型"""
+
+    __tablename__ = "liabilities"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(200), nullable=False)  # 负债名称
+    value = Column(Float, nullable=False)  # 负债金额
+    category = Column(
+        String(20), nullable=False, index=True
+    )  # 负债类别: current/non-current
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)

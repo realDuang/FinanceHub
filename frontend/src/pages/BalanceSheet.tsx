@@ -6,23 +6,24 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 import {
   AssetItem,
   LiabilityItem,
-  BalanceSheetData,
   FinancialRatios,
 } from "./types";
+import { useAssets, useLiabilities } from "../hooks/useBalanceSheetApi";
 import AddItemModal from "../components/BalanceSheet/AddItemModal";
 import EditItemModal from "../components/BalanceSheet/EditItemModal";
 import FinancialSummary from "../components/BalanceSheet/FinancialSummary";
 import VisualizationDashboard from "../components/BalanceSheet/VisualizationDashboard";
 
 const BalanceSheet: React.FC = () => {
-  const [data, setData] = useState<BalanceSheetData>({
-    assets: [],
-    liabilities: [],
-  });
+  // 使用数据库 API hooks
+  const { assets, loading: assetsLoading, error: assetsError, createAsset, updateAsset, deleteAsset } = useAssets();
+  const { liabilities, loading: liabilitiesLoading, error: liabilitiesError, createLiability, updateLiability, deleteLiability } = useLiabilities();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -33,18 +34,28 @@ const BalanceSheet: React.FC = () => {
   const [addType, setAddType] = useState<"asset" | "liability">("asset");
 
   const calculateFinancialRatios = (): FinancialRatios => {
-    const currentAssets = data.assets
+    if (!assets || !liabilities) {
+      return {
+        currentRatio: 0,
+        debtToEquityRatio: 0,
+        netWorth: 0,
+        totalAssets: 0,
+        totalLiabilities: 0,
+      };
+    }
+
+    const currentAssets = assets
       .filter((a) => a.category === "current")
       .reduce((sum, a) => sum + a.value, 0);
-    const nonCurrentAssets = data.assets
+    const nonCurrentAssets = assets
       .filter((a) => a.category === "non-current")
-      .reduce((sum, l) => sum + l.value, 0);
+      .reduce((sum, a) => sum + a.value, 0);
     const totalAssets = currentAssets + nonCurrentAssets;
 
-    const currentLiabilities = data.liabilities
+    const currentLiabilities = liabilities
       .filter((l) => l.category === "current")
       .reduce((sum, l) => sum + l.value, 0);
-    const nonCurrentLiabilities = data.liabilities
+    const nonCurrentLiabilities = liabilities
       .filter((l) => l.category === "non-current")
       .reduce((sum, l) => sum + l.value, 0);
     const totalLiabilities = currentLiabilities + nonCurrentLiabilities;
@@ -63,56 +74,44 @@ const BalanceSheet: React.FC = () => {
     };
   };
 
-  const handleAddItem = (item: Omit<AssetItem | LiabilityItem, "id">) => {
-    const newItem = { ...item, id: Date.now().toString() };
-
-    if (addType === "asset") {
-      setData((prev) => ({
-        ...prev,
-        assets: [...prev.assets, newItem as AssetItem],
-      }));
-    } else {
-      setData((prev) => ({
-        ...prev,
-        liabilities: [...prev.liabilities, newItem as LiabilityItem],
-      }));
+  const handleAddItem = async (item: Omit<AssetItem | LiabilityItem, "id">) => {
+    try {
+      if (addType === "asset") {
+        await createAsset(item as Omit<AssetItem, "id">);
+      } else {
+        await createLiability(item as Omit<LiabilityItem, "id">);
+      }
+      setShowAddModal(false);
+    } catch (error) {
+      console.error("添加项目失败:", error);
     }
-    setShowAddModal(false);
   };
 
-  const handleEditItem = (updatedItem: AssetItem | LiabilityItem) => {
-    if (!editingItem) return;
+  const handleEditItem = async (updatedItem: AssetItem | LiabilityItem) => {
+    if (!editingItem || !updatedItem.id) return;
 
-    if (editingItem.type === "asset") {
-      setData((prev) => ({
-        ...prev,
-        assets: prev.assets.map((a) =>
-          a.id === updatedItem.id ? (updatedItem as AssetItem) : a
-        ),
-      }));
-    } else {
-      setData((prev) => ({
-        ...prev,
-        liabilities: prev.liabilities.map((l) =>
-          l.id === updatedItem.id ? (updatedItem as LiabilityItem) : l
-        ),
-      }));
+    try {
+      if (editingItem.type === "asset") {
+        await updateAsset(updatedItem.id, updatedItem as AssetItem);
+      } else {
+        await updateLiability(updatedItem.id, updatedItem as LiabilityItem);
+      }
+      setShowEditModal(false);
+      setEditingItem(null);
+    } catch (error) {
+      console.error("更新项目失败:", error);
     }
-    setShowEditModal(false);
-    setEditingItem(null);
   };
 
-  const handleDeleteItem = (type: "asset" | "liability", id: string) => {
-    if (type === "asset") {
-      setData((prev) => ({
-        ...prev,
-        assets: prev.assets.filter((a) => a.id !== id),
-      }));
-    } else {
-      setData((prev) => ({
-        ...prev,
-        liabilities: prev.liabilities.filter((l) => l.id !== id),
-      }));
+  const handleDeleteItem = async (type: "asset" | "liability", id: number) => {
+    try {
+      if (type === "asset") {
+        await deleteAsset(id);
+      } else {
+        await deleteLiability(id);
+      }
+    } catch (error) {
+      console.error("删除项目失败:", error);
     }
   };
 
@@ -122,6 +121,35 @@ const BalanceSheet: React.FC = () => {
       currency: "CNY",
     }).format(amount);
   };
+
+  // 加载状态
+  if (assetsLoading || liabilitiesLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="flex items-center gap-3 text-slate-600">
+          <Loader2 className="h-6 w-6 animate-spin" />
+          <span>加载资产负债数据中...</span>
+        </div>
+      </div>
+    );
+  }
+
+  // 错误状态
+  if (assetsError || liabilitiesError) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
+        <div className="bg-white rounded-lg shadow-lg p-6 max-w-md">
+          <div className="flex items-center gap-3 text-red-600 mb-4">
+            <AlertCircle className="h-6 w-6" />
+            <span className="font-semibold">加载数据失败</span>
+          </div>
+          <p className="text-slate-600">
+            {assetsError || liabilitiesError}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   const ratios = calculateFinancialRatios();
 
@@ -142,7 +170,7 @@ const BalanceSheet: React.FC = () => {
         <FinancialSummary ratios={ratios} />
 
         <div className="mb-8">
-          <VisualizationDashboard assets={data.assets} />
+          <VisualizationDashboard assets={assets || []} />
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
@@ -173,7 +201,7 @@ const BalanceSheet: React.FC = () => {
                   <span className="text-sm text-slate-500">(现金及等价物)</span>
                 </h3>
                 <div className="space-y-3">
-                  {data.assets
+                  {(assets || [])
                     .filter((asset) => asset.category === "current")
                     .map((asset) => (
                       <div
@@ -201,7 +229,7 @@ const BalanceSheet: React.FC = () => {
                             </button>
                             <button
                               onClick={() =>
-                                handleDeleteItem("asset", asset.id)
+                                asset.id && handleDeleteItem("asset", asset.id)
                               }
                               className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                             >
@@ -220,7 +248,7 @@ const BalanceSheet: React.FC = () => {
                   <span className="text-sm text-slate-500">(长期投资)</span>
                 </h3>
                 <div className="space-y-3">
-                  {data.assets
+                  {(assets || [])
                     .filter((asset) => asset.category === "non-current")
                     .map((asset) => (
                       <div
@@ -248,7 +276,7 @@ const BalanceSheet: React.FC = () => {
                             </button>
                             <button
                               onClick={() =>
-                                handleDeleteItem("asset", asset.id)
+                                asset.id && handleDeleteItem("asset", asset.id)
                               }
                               className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                             >
@@ -301,7 +329,7 @@ const BalanceSheet: React.FC = () => {
                   <span className="text-sm text-slate-500">(短期债务)</span>
                 </h3>
                 <div className="space-y-3">
-                  {data.liabilities
+                  {(liabilities || [])
                     .filter((liability) => liability.category === "current")
                     .map((liability) => (
                       <div
@@ -332,7 +360,7 @@ const BalanceSheet: React.FC = () => {
                             </button>
                             <button
                               onClick={() =>
-                                handleDeleteItem("liability", liability.id)
+                                liability.id && handleDeleteItem("liability", liability.id)
                               }
                               className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                             >
@@ -351,7 +379,7 @@ const BalanceSheet: React.FC = () => {
                   <span className="text-sm text-slate-500">(长期债务)</span>
                 </h3>
                 <div className="space-y-3">
-                  {data.liabilities
+                  {(liabilities || [])
                     .filter((liability) => liability.category === "non-current")
                     .map((liability) => (
                       <div
@@ -382,7 +410,7 @@ const BalanceSheet: React.FC = () => {
                             </button>
                             <button
                               onClick={() =>
-                                handleDeleteItem("liability", liability.id)
+                                liability.id && handleDeleteItem("liability", liability.id)
                               }
                               className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                             >

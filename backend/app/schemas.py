@@ -138,3 +138,80 @@ class FinancialQuery(BaseModel):
     limit: int = 100
     order_by: str = "month_date"
     order_direction: Literal["asc", "desc"] = "desc"
+
+
+# 资产负债表相关模型
+class AssetCategory(enum.Enum):
+    """资产类别枚举"""
+    CURRENT = "current"  # 流动资产
+    NON_CURRENT = "non-current"  # 非流动资产
+
+
+class LiabilityCategory(enum.Enum):
+    """负债类别枚举"""
+    CURRENT = "current"  # 流动负债
+    NON_CURRENT = "non-current"  # 非流动负债
+
+
+class AssetBase(BaseModel):
+    """资产基础模型"""
+    name: str
+    value: float
+    category: str  # current 或 non-current
+
+
+class AssetCreate(AssetBase):
+    """创建资产模型"""
+    pass
+
+
+class AssetUpdate(BaseModel):
+    """更新资产模型"""
+    name: Optional[str] = None
+    value: Optional[float] = None
+    category: Optional[str] = None
+
+
+class Asset(AssetBase):
+    """资产模型"""
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class LiabilityBase(BaseModel):
+    """负债基础模型"""
+    name: str
+    value: float
+    category: str  # current 或 non-current
+
+
+class LiabilityCreate(LiabilityBase):
+    """创建负债模型"""
+    pass
+
+
+class LiabilityUpdate(BaseModel):
+    """更新负债模型"""
+    name: Optional[str] = None
+    value: Optional[float] = None
+    category: Optional[str] = None
+
+
+class Liability(LiabilityBase):
+    """负债模型"""
+    id: int
+    created_at: datetime
+    updated_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class BalanceSheetData(BaseModel):
+    """资产负债表数据模型"""
+    assets: List[Asset]
+    liabilities: List[Liability]
