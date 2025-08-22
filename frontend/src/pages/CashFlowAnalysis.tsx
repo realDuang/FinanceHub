@@ -87,6 +87,7 @@ const CashFlowAnalysis: React.FC = () => {
               <TimeRangeSelector
                 value={timeRange}
                 onChange={handleTimeRangeChange}
+                allData={allData || undefined}
               />
             </div>
           </div>

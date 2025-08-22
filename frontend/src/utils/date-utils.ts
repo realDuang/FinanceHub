@@ -47,7 +47,6 @@ export function getDateRangeFromTimeRange(
   allData?: FinancialAggregationRecord[]
 ): DateRange {
   const now = new Date();
-  const currentYear = now.getFullYear();
   
   switch (timeRange) {
     case 'last3months': {
@@ -63,16 +62,23 @@ export function getDateRangeFromTimeRange(
         endDate: now.toISOString().split('T')[0],
       };
     }
-    case 'thisyear': {
-      // 年初至今
+    case 'all': {
+      // 总计 - 不设置日期范围
       return {
-        startDate: `${currentYear}-01-01`,
-        endDate: now.toISOString().split('T')[0],
+        startDate: null,
+        endDate: null,
       };
     }
-    case 'all':
     default: {
-      // 总计 - 不设置日期范围
+      // 检查是否是年份（数字字符串）
+      const year = parseInt(timeRange);
+      if (!isNaN(year) && year >= 1900 && year <= 3000) {
+        return {
+          startDate: `${year}-01-01`,
+          endDate: `${year}-12-31`,
+        };
+      }
+      // 如果不是有效年份，返回总计
       return {
         startDate: null,
         endDate: null,
@@ -125,10 +131,15 @@ export function formatDateRangeText(
       }
       return '最近三个月';
     }
-    case 'thisyear':
-      return `${new Date().getFullYear()}年至今`;
     case 'all':
-    default:
       return '全部数据';
+    default: {
+      // 检查是否是年份
+      const year = parseInt(timeRange);
+      if (!isNaN(year) && year >= 1900 && year <= 3000) {
+        return `${year}年全年`;
+      }
+      return '全部数据';
+    }
   }
 }

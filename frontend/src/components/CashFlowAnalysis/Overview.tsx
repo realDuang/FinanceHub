@@ -5,8 +5,8 @@ import { FinancialAggregationRecord } from "../../services/types";
 interface StatCardProps {
   title: string;
   value: string;
-  change: string;
-  changeType: "positive" | "negative";
+  change?: string;
+  changeType?: "positive" | "negative";
   icon: React.ReactNode;
 }
 
@@ -23,20 +23,22 @@ const StatCard: React.FC<StatCardProps> = ({
         <div>
           <p className="text-sm font-medium text-gray-600 mb-1">{title}</p>
           <p className="text-2xl font-bold text-gray-900">{value}</p>
-          <div className="flex items-center mt-2">
-            {changeType === "positive" ? (
-              <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
-            ) : (
-              <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
-            )}
-            <span
-              className={`text-sm font-medium ${
-                changeType === "positive" ? "text-green-600" : "text-red-600"
-              }`}
-            >
-              {change}
-            </span>
-          </div>
+          {change && changeType && (
+            <div className="flex items-center mt-2">
+              {changeType === "positive" ? (
+                <TrendingUp className="w-4 h-4 text-green-500 mr-1" />
+              ) : (
+                <TrendingDown className="w-4 h-4 text-red-500 mr-1" />
+              )}
+              <span
+                className={`text-sm font-medium ${
+                  changeType === "positive" ? "text-green-600" : "text-red-600"
+                }`}
+              >
+                {change}
+              </span>
+            </div>
+          )}
         </div>
         <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg text-white">
           {icon}
@@ -88,83 +90,64 @@ const Overview: React.FC<OverviewProps> = ({ financialData, loading }) => {
   }
 
   // 计算统计数据
-  const latestRecord = financialData[financialData.length - 1];
-  const previousRecord = financialData[financialData.length - 2];
+  // 计算总收入（所有月份的收入总和）
+  const totalIncome = financialData.reduce((sum, record) => sum + record.salary, 0);
 
-  const totalIncome = latestRecord.salary;
-  const incomeChange = (
-    ((latestRecord.salary - previousRecord.salary) / previousRecord.salary) *
-    100
-  ).toFixed(1);
+  // 计算总支出（所有月份的支出总和）
+  const totalExpenses = financialData.reduce((sum, record) => {
+    return sum + Math.abs(
+      record.housing +
+      record.dining +
+      record.living +
+      record.entertainment +
+      record.transportation +
+      record.travel +
+      record.gifts
+    );
+  }, 0);
 
-  const totalExpenses = Math.abs(
-    latestRecord.housing +
-      latestRecord.dining +
-      latestRecord.living +
-      latestRecord.entertainment +
-      latestRecord.transportation +
-      latestRecord.travel +
-      latestRecord.gifts
-  );
-  const previousExpense = Math.abs(
-    previousRecord.housing +
-      previousRecord.dining +
-      previousRecord.living +
-      previousRecord.entertainment +
-      previousRecord.transportation +
-      previousRecord.travel +
-      previousRecord.gifts
-  );
-  const expenseChange = (
-    ((totalExpenses - previousExpense) / previousExpense) *
-    100
-  ).toFixed(1);
+  // 计算总结余（总收入 - 总支出）
+  const totalBalance = totalIncome - totalExpenses;
+
+  // 计算均匀消费支出（平均每月支出）
+  const avgMonthlyExpenses = totalExpenses / financialData.length;
+  const avgMonthlyExpensesLastPeriod = financialData.length > 1 ? 
+    financialData.slice(0, -1).reduce((sum, record) => {
+      return sum + Math.abs(
+        record.housing +
+        record.dining +
+        record.living +
+        record.entertainment +
+        record.transportation +
+        record.travel +
+        record.gifts
+      );
+    }, 0) / (financialData.length - 1) : 0;
+  const avgExpenseChange = avgMonthlyExpensesLastPeriod > 0 ?
+    (((avgMonthlyExpenses - avgMonthlyExpensesLastPeriod) / avgMonthlyExpensesLastPeriod) * 100).toFixed(1) : "0.0";
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <StatCard
-        title="本月收入"
+        title="总收入"
         value={`¥${totalIncome.toLocaleString()}`}
-        change={`${incomeChange}%`}
-        changeType={parseFloat(incomeChange) >= 0 ? "positive" : "negative"}
         icon={<Wallet className="w-6 h-6" />}
       />
       <StatCard
-        title="本月支出"
+        title="总支出"
         value={`¥${totalExpenses.toLocaleString()}`}
-        change={`${expenseChange}%`}
-        changeType={parseFloat(expenseChange) <= 0 ? "positive" : "negative"}
         icon={<CreditCard className="w-6 h-6" />}
       />
       <StatCard
-        title="结余"
-        value={`¥${latestRecord.balance.toLocaleString()}`}
-        change={`${(
-          ((latestRecord.balance - previousRecord.balance) /
-            previousRecord.balance) *
-          100
-        ).toFixed(1)}%`}
-        changeType={
-          latestRecord.balance > previousRecord.balance
-            ? "positive"
-            : "negative"
-        }
+        title="总结余"
+        value={`¥${totalBalance.toLocaleString()}`}
         icon={<TrendingUp className="w-6 h-6" />}
       />
       <StatCard
         title="均匀消费支出"
-        value={`¥${Math.abs(latestRecord.avg_consumption).toLocaleString()}`}
-        change={`${(
-          ((latestRecord.avg_consumption - previousRecord.avg_consumption) /
-            previousRecord.avg_consumption) *
-          100
-        ).toFixed(1)}%`}
-        changeType={
-          Math.abs(latestRecord.avg_consumption) <=
-          Math.abs(previousRecord.avg_consumption)
-            ? "positive"
-            : "negative"
-        }
+        value={`¥${avgMonthlyExpenses.toLocaleString()}`}
+        change={`${avgExpenseChange}%`}
+        changeType={parseFloat(avgExpenseChange) <= 0 ? "positive" : "negative"}
         icon={<TrendingDown className="w-6 h-6" />}
       />
     </div>

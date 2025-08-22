@@ -1,18 +1,42 @@
 import React from 'react';
 import { CalendarDays } from 'lucide-react';
+import type { FinancialAggregationRecord } from '../../services/types';
 
-export type TimeRange = 'last3months' | 'thisyear' | 'all';
+export type TimeRange = 'all' | 'last3months' | string; // string 用于年份，如 '2023', '2024'
 
 interface TimeRangeSelectorProps {
   value: TimeRange;
   onChange: (range: TimeRange) => void;
+  allData?: FinancialAggregationRecord[];
 }
 
-const TimeRangeSelector: React.FC<TimeRangeSelectorProps> = ({ value, onChange }) => {
+/**
+ * 从数据中提取所有可用的年份
+ */
+function getAvailableYears(data?: FinancialAggregationRecord[]): number[] {
+  if (!data || data.length === 0) {
+    return [];
+  }
+
+  const years = new Set<number>();
+  data.forEach(record => {
+    const date = new Date(record.month_date);
+    years.add(date.getFullYear());
+  });
+
+  return Array.from(years).sort((a, b) => b - a); // 降序排列
+}
+
+const TimeRangeSelector: React.FC<TimeRangeSelectorProps> = ({ value, onChange, allData }) => {
+  const availableYears = getAvailableYears(allData);
+  
   const options = [
-    { value: 'last3months' as TimeRange, label: '最近三个月' },
-    { value: 'thisyear' as TimeRange, label: '年初至今' },
     { value: 'all' as TimeRange, label: '总计' },
+    { value: 'last3months' as TimeRange, label: '最近三个月' },
+    ...availableYears.map(year => ({
+      value: year.toString() as TimeRange,
+      label: `${year}年`
+    }))
   ];
 
   return (
