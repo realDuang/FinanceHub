@@ -9,11 +9,11 @@ import {
   Loader2,
   AlertCircle,
 } from "lucide-react";
-import {
+import type {
   AssetItem,
   LiabilityItem,
   FinancialRatios,
-} from "./types";
+} from "../interfaces";
 import { useAssets, useLiabilities } from "../hooks/useBalanceSheetApi";
 import AddItemModal from "../components/BalanceSheet/AddItemModal";
 import EditItemModal from "../components/BalanceSheet/EditItemModal";
@@ -22,8 +22,22 @@ import VisualizationDashboard from "../components/BalanceSheet/VisualizationDash
 
 const BalanceSheet: React.FC = () => {
   // 使用数据库 API hooks
-  const { assets, loading: assetsLoading, error: assetsError, createAsset, updateAsset, deleteAsset } = useAssets();
-  const { liabilities, loading: liabilitiesLoading, error: liabilitiesError, createLiability, updateLiability, deleteLiability } = useLiabilities();
+  const {
+    assets,
+    loading: assetsLoading,
+    error: assetsError,
+    createAsset,
+    updateAsset,
+    deleteAsset,
+  } = useAssets();
+  const {
+    liabilities,
+    loading: liabilitiesLoading,
+    error: liabilitiesError,
+    createLiability,
+    updateLiability,
+    deleteLiability,
+  } = useLiabilities();
 
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -143,9 +157,7 @@ const BalanceSheet: React.FC = () => {
             <AlertCircle className="h-6 w-6" />
             <span className="font-semibold">加载数据失败</span>
           </div>
-          <p className="text-slate-600">
-            {assetsError || liabilitiesError}
-          </p>
+          <p className="text-slate-600">{assetsError || liabilitiesError}</p>
         </div>
       </div>
     );
@@ -360,7 +372,8 @@ const BalanceSheet: React.FC = () => {
                             </button>
                             <button
                               onClick={() =>
-                                liability.id && handleDeleteItem("liability", liability.id)
+                                liability.id &&
+                                handleDeleteItem("liability", liability.id)
                               }
                               className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                             >
@@ -410,7 +423,8 @@ const BalanceSheet: React.FC = () => {
                             </button>
                             <button
                               onClick={() =>
-                                liability.id && handleDeleteItem("liability", liability.id)
+                                liability.id &&
+                                handleDeleteItem("liability", liability.id)
                               }
                               className="p-1.5 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded transition-all"
                             >

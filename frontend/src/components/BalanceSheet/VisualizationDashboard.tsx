@@ -1,9 +1,6 @@
 import React from "react";
 import { PieChart, BarChart3 } from "lucide-react";
-import {
-  AssetItem,
-  AssetDistribution,
-} from "../../pages/types";
+import type { AssetItem, AssetDistribution } from "../../interfaces";
 import AssetDistributionChart from "./AssetDistributionChart";
 
 interface VisualizationDashboardProps {

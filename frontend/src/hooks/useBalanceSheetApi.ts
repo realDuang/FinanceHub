@@ -1,7 +1,7 @@
-import { useState, useEffect } from 'react';
-import { AssetItem, LiabilityItem, BalanceSheetData } from '../pages/types';
+import { useState, useEffect } from "react";
+import type { AssetItem, LiabilityItem, BalanceSheetData } from "../interfaces";
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = "http://localhost:8000/api/v1";
 
 // 资产相关 API
 export const useAssets = () => {
@@ -13,12 +13,12 @@ export const useAssets = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/balance-sheet/assets`);
-      if (!response.ok) throw new Error('获取资产数据失败');
+      if (!response.ok) throw new Error("获取资产数据失败");
       const data = await response.json();
       setAssets(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      setError(err instanceof Error ? err.message : "未知错误");
     } finally {
       setLoading(false);
     }
@@ -28,47 +28,53 @@ export const useAssets = () => {
     fetchAssets();
   }, []);
 
-  const createAsset = async (asset: Omit<AssetItem, 'id'>) => {
+  const createAsset = async (asset: Omit<AssetItem, "id">) => {
     try {
       const response = await fetch(`${API_BASE_URL}/balance-sheet/assets`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(asset),
       });
-      if (!response.ok) throw new Error('创建资产失败');
+      if (!response.ok) throw new Error("创建资产失败");
       const newAsset = await response.json();
-      setAssets(prev => [newAsset, ...prev]);
+      setAssets((prev) => [newAsset, ...prev]);
       return newAsset;
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : '创建资产失败');
+      throw new Error(err instanceof Error ? err.message : "创建资产失败");
     }
   };
 
   const updateAsset = async (id: number, asset: Partial<AssetItem>) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/balance-sheet/assets/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(asset),
-      });
-      if (!response.ok) throw new Error('更新资产失败');
+      const response = await fetch(
+        `${API_BASE_URL}/balance-sheet/assets/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(asset),
+        }
+      );
+      if (!response.ok) throw new Error("更新资产失败");
       const updatedAsset = await response.json();
-      setAssets(prev => prev.map(a => a.id === id ? updatedAsset : a));
+      setAssets((prev) => prev.map((a) => (a.id === id ? updatedAsset : a)));
       return updatedAsset;
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : '更新资产失败');
+      throw new Error(err instanceof Error ? err.message : "更新资产失败");
     }
   };
 
   const deleteAsset = async (id: number) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/balance-sheet/assets/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('删除资产失败');
-      setAssets(prev => prev.filter(a => a.id !== id));
+      const response = await fetch(
+        `${API_BASE_URL}/balance-sheet/assets/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("删除资产失败");
+      setAssets((prev) => prev.filter((a) => a.id !== id));
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : '删除资产失败');
+      throw new Error(err instanceof Error ? err.message : "删除资产失败");
     }
   };
 
@@ -93,12 +99,12 @@ export const useLiabilities = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/balance-sheet/liabilities`);
-      if (!response.ok) throw new Error('获取负债数据失败');
+      if (!response.ok) throw new Error("获取负债数据失败");
       const data = await response.json();
       setLiabilities(data);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      setError(err instanceof Error ? err.message : "未知错误");
     } finally {
       setLoading(false);
     }
@@ -108,47 +114,61 @@ export const useLiabilities = () => {
     fetchLiabilities();
   }, []);
 
-  const createLiability = async (liability: Omit<LiabilityItem, 'id'>) => {
+  const createLiability = async (liability: Omit<LiabilityItem, "id">) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/balance-sheet/liabilities`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(liability),
-      });
-      if (!response.ok) throw new Error('创建负债失败');
+      const response = await fetch(
+        `${API_BASE_URL}/balance-sheet/liabilities`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(liability),
+        }
+      );
+      if (!response.ok) throw new Error("创建负债失败");
       const newLiability = await response.json();
-      setLiabilities(prev => [newLiability, ...prev]);
+      setLiabilities((prev) => [newLiability, ...prev]);
       return newLiability;
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : '创建负债失败');
+      throw new Error(err instanceof Error ? err.message : "创建负债失败");
     }
   };
 
-  const updateLiability = async (id: number, liability: Partial<LiabilityItem>) => {
+  const updateLiability = async (
+    id: number,
+    liability: Partial<LiabilityItem>
+  ) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/balance-sheet/liabilities/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(liability),
-      });
-      if (!response.ok) throw new Error('更新负债失败');
+      const response = await fetch(
+        `${API_BASE_URL}/balance-sheet/liabilities/${id}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(liability),
+        }
+      );
+      if (!response.ok) throw new Error("更新负债失败");
       const updatedLiability = await response.json();
-      setLiabilities(prev => prev.map(l => l.id === id ? updatedLiability : l));
+      setLiabilities((prev) =>
+        prev.map((l) => (l.id === id ? updatedLiability : l))
+      );
       return updatedLiability;
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : '更新负债失败');
+      throw new Error(err instanceof Error ? err.message : "更新负债失败");
     }
   };
 
   const deleteLiability = async (id: number) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/balance-sheet/liabilities/${id}`, {
-        method: 'DELETE',
-      });
-      if (!response.ok) throw new Error('删除负债失败');
-      setLiabilities(prev => prev.filter(l => l.id !== id));
+      const response = await fetch(
+        `${API_BASE_URL}/balance-sheet/liabilities/${id}`,
+        {
+          method: "DELETE",
+        }
+      );
+      if (!response.ok) throw new Error("删除负债失败");
+      setLiabilities((prev) => prev.filter((l) => l.id !== id));
     } catch (err) {
-      throw new Error(err instanceof Error ? err.message : '删除负债失败');
+      throw new Error(err instanceof Error ? err.message : "删除负债失败");
     }
   };
 
@@ -165,7 +185,10 @@ export const useLiabilities = () => {
 
 // 完整资产负债表数据
 export const useBalanceSheetData = () => {
-  const [data, setData] = useState<BalanceSheetData>({ assets: [], liabilities: [] });
+  const [data, setData] = useState<BalanceSheetData>({
+    assets: [],
+    liabilities: [],
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -173,12 +196,12 @@ export const useBalanceSheetData = () => {
     try {
       setLoading(true);
       const response = await fetch(`${API_BASE_URL}/balance-sheet/data`);
-      if (!response.ok) throw new Error('获取资产负债表数据失败');
+      if (!response.ok) throw new Error("获取资产负债表数据失败");
       const balanceSheetData = await response.json();
       setData(balanceSheetData);
       setError(null);
     } catch (err) {
-      setError(err instanceof Error ? err.message : '未知错误');
+      setError(err instanceof Error ? err.message : "未知错误");
     } finally {
       setLoading(false);
     }
