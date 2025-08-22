@@ -25,13 +25,6 @@ export interface FinancialRatios {
   totalLiabilities: number;
 }
 
-export interface HistoricalData {
-  date: string;
-  netWorth: number;
-  totalAssets: number;
-  totalLiabilities: number;
-}
-
 export interface AssetDistribution {
   name: string;
   value: number;

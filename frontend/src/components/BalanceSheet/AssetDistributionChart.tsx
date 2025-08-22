@@ -48,6 +48,7 @@ const AssetDistributionChart: React.FC<AssetDistributionChartProps> = ({ data })
     maintainAspectRatio: false,
     plugins: {
       legend: {
+        display: data.length <= 6, // 当数据项超过6个时隐藏图例
         position: 'bottom' as const,
         labels: {
           padding: 15,

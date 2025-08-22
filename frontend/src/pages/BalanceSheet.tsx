@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState } from "react";
 import {
   Plus,
   Edit2,
@@ -6,7 +6,6 @@ import {
   TrendingUp,
   TrendingDown,
   DollarSign,
-  PieChart,
 } from "lucide-react";
 import {
   AssetItem,
@@ -18,7 +17,6 @@ import AddItemModal from "../components/BalanceSheet/AddItemModal";
 import EditItemModal from "../components/BalanceSheet/EditItemModal";
 import FinancialSummary from "../components/BalanceSheet/FinancialSummary";
 import VisualizationDashboard from "../components/BalanceSheet/VisualizationDashboard";
-import { HistoricalData } from "./types";
 
 const BalanceSheet: React.FC = () => {
   const [data, setData] = useState<BalanceSheetData>({
@@ -33,15 +31,14 @@ const BalanceSheet: React.FC = () => {
     item: AssetItem | LiabilityItem;
   } | null>(null);
   const [addType, setAddType] = useState<"asset" | "liability">("asset");
-  const [historicalData, setHistoricalData] = useState<HistoricalData[]>([]);
 
-  const calculateFinancialRatios = useCallback((): FinancialRatios => {
+  const calculateFinancialRatios = (): FinancialRatios => {
     const currentAssets = data.assets
       .filter((a) => a.category === "current")
       .reduce((sum, a) => sum + a.value, 0);
     const nonCurrentAssets = data.assets
       .filter((a) => a.category === "non-current")
-      .reduce((sum, a) => sum + a.value, 0);
+      .reduce((sum, l) => sum + l.value, 0);
     const totalAssets = currentAssets + nonCurrentAssets;
 
     const currentLiabilities = data.liabilities
@@ -53,7 +50,8 @@ const BalanceSheet: React.FC = () => {
     const totalLiabilities = currentLiabilities + nonCurrentLiabilities;
 
     const netWorth = totalAssets - totalLiabilities;
-    const currentRatio = currentLiabilities > 0 ? currentAssets / currentLiabilities : 0;
+    const currentRatio =
+      currentLiabilities > 0 ? currentAssets / currentLiabilities : 0;
     const debtToEquityRatio = netWorth > 0 ? totalLiabilities / netWorth : 0;
 
     return {
@@ -63,63 +61,7 @@ const BalanceSheet: React.FC = () => {
       totalAssets,
       totalLiabilities,
     };
-  }, [data]);
-
-  useEffect(() => {
-    const savedData = localStorage.getItem("balance-sheet-data");
-    if (savedData) {
-      setData(JSON.parse(savedData));
-    } else {
-      // 添加示例数据
-      const sampleData: BalanceSheetData = {
-        assets: [
-          { id: "1", name: "银行存款", value: 50000, category: "current" },
-          { id: "2", name: "投资账户", value: 120000, category: "current" },
-          { id: "3", name: "房产", value: 800000, category: "non-current" },
-          { id: "4", name: "汽车", value: 200000, category: "non-current" },
-        ],
-        liabilities: [
-          { id: "1", name: "信用卡债务", value: 8000, category: "current" },
-          { id: "2", name: "房贷", value: 450000, category: "non-current" },
-          { id: "3", name: "车贷", value: 80000, category: "non-current" },
-        ],
-      };
-      setData(sampleData);
-      localStorage.setItem("balance-sheet-data", JSON.stringify(sampleData));
-    }
-
-    // 加载历史数据
-    const savedHistoricalData = localStorage.getItem(
-      "balance-sheet-historical"
-    );
-    if (savedHistoricalData) {
-      setHistoricalData(JSON.parse(savedHistoricalData));
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("balance-sheet-data", JSON.stringify(data));
-
-    // 每次数据变化时，记录历史数据（每天最多记录一次）
-    const today = new Date().toISOString().split("T")[0];
-    const ratios = calculateFinancialRatios();
-
-    setHistoricalData((prev) => {
-      const filtered = prev.filter((item) => !item.date.startsWith(today));
-      const newData = [
-        ...filtered,
-        {
-          date: today,
-          netWorth: ratios.netWorth,
-          totalAssets: ratios.totalAssets,
-          totalLiabilities: ratios.totalLiabilities,
-        },
-      ].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-
-      localStorage.setItem("balance-sheet-historical", JSON.stringify(newData));
-      return newData;
-    });
-  }, [data, calculateFinancialRatios]);
+  };
 
   const handleAddItem = (item: Omit<AssetItem | LiabilityItem, "id">) => {
     const newItem = { ...item, id: Date.now().toString() };
@@ -190,9 +132,7 @@ const BalanceSheet: React.FC = () => {
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <DollarSign className="h-8 w-8 text-emerald-600" />
-            <h1 className="text-3xl font-bold text-slate-800">
-              资产负债管理
-            </h1>
+            <h1 className="text-3xl font-bold text-slate-800">资产负债管理</h1>
           </div>
           <p className="text-slate-600 max-w-2xl">
             管理您的个人财务，追踪资产与负债，实现财富增长目标
@@ -201,11 +141,9 @@ const BalanceSheet: React.FC = () => {
 
         <FinancialSummary ratios={ratios} />
 
-        <VisualizationDashboard
-          assets={data.assets}
-          liabilities={data.liabilities}
-          historicalData={historicalData}
-        />
+        <div className="mb-8">
+          <VisualizationDashboard assets={data.assets} />
+        </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
           {/* 资产部分 */}
@@ -468,38 +406,6 @@ const BalanceSheet: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* 净资产汇总 */}
-        <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-          <div
-            className={`px-6 py-4 ${
-              ratios.netWorth >= 0
-                ? "bg-gradient-to-r from-blue-500 to-indigo-600"
-                : "bg-gradient-to-r from-orange-500 to-red-600"
-            }`}
-          >
-            <div className="flex items-center justify-center gap-3">
-              <PieChart className="h-6 w-6 text-white" />
-              <h2 className="text-xl font-semibold text-white">
-                净资产 (所有者权益)
-              </h2>
-            </div>
-          </div>
-          <div className="p-6 text-center">
-            <div
-              className={`text-4xl font-bold mb-2 ${
-                ratios.netWorth >= 0 ? "text-blue-600" : "text-orange-600"
-              }`}
-            >
-              {formatCurrency(ratios.netWorth)}
-            </div>
-            <p className="text-slate-600">
-              {ratios.netWorth >= 0
-                ? "恭喜！您的净资产为正值"
-                : "需要关注：净资产为负值，建议优化财务结构"}
-            </p>
           </div>
         </div>
       </div>
