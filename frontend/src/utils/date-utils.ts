@@ -1,4 +1,4 @@
-import { TimeRange } from '../components/TimeRangeSelector';
+import { TimeRange } from '../components/CashFlowAnalysis/TimeRangeSelector';
 import type { FinancialAggregationRecord } from '../services/types';
 
 export interface DateRange {

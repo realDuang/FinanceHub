@@ -1,6 +1,6 @@
 import React from "react";
 import { Wallet, TrendingUp, TrendingDown, CreditCard } from "lucide-react";
-import { FinancialAggregationRecord } from "../services/types";
+import { FinancialAggregationRecord } from "../../services/types";
 
 interface StatCardProps {
   title: string;

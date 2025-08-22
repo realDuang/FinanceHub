@@ -14,8 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
-import { FinancialAggregationRecord } from "../services/types";
-import { formatCurrency, formatDate } from "../utils/chart-utils";
+import { FinancialAggregationRecord } from "../../services/types";
+import { formatCurrency, formatDate } from "../../utils/chart-utils";
 
 interface FinancialDataTableProps {
   data: FinancialAggregationRecord[];

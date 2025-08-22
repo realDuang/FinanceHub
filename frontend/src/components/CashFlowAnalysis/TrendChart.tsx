@@ -3,35 +3,35 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
   Legend,
+  Filler,
   ChartOptions,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { expenseCategories } from "../utils/chart-utils";
-import { FinancialAggregationRecord } from "../services/types";
+import { FinancialAggregationRecord } from "../../services/types";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
+  PointElement,
+  LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
-interface MonthlyExpenseChartProps {
+interface TrendChartProps {
   financialData: FinancialAggregationRecord[] | null;
   loading: boolean;
 }
 
-const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
-  financialData,
-  loading,
-}) => {
-  const chartRef = useRef<ChartJS<"bar">>(null);
+const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
+  const chartRef = useRef<ChartJS<"line">>(null);
 
   // 处理 loading 状态和空数据
   if (loading) {
@@ -54,7 +54,6 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
     );
   }
 
-  // 准备数据：按月份和消费类别聚合
   const months = financialData.map((record) => {
     const date = new Date(record.month_date);
     return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(
@@ -63,24 +62,43 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
     )}`;
   });
 
-  const datasets = expenseCategories.map((category) => ({
-    label: category.label,
-    data: financialData.map(
-      (record) => record[category.key as keyof typeof record] as number
-    ),
-    backgroundColor: category.color,
-    borderColor: category.color,
-    borderWidth: 1,
-    borderRadius: 6,
-    borderSkipped: false,
-  }));
-
   const data = {
     labels: months,
-    datasets,
+    datasets: [
+      {
+        label: "近三月均匀消费支出",
+        data: financialData.map((record) => 
+          Math.abs(record.recent_avg_consumption)
+        ),
+        borderColor: "rgb(59, 130, 246)",
+        backgroundColor: "rgba(59, 130, 246, 0.1)",
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: "rgb(59, 130, 246)",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+      },
+      {
+        label: "月均支出",
+        data: financialData.map((record) => Math.abs(record.avg_consumption)),
+        borderColor: "rgb(16, 185, 129)",
+        backgroundColor: "rgba(16, 185, 129, 0.1)",
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 6,
+        pointHoverRadius: 8,
+        pointBackgroundColor: "rgb(16, 185, 129)",
+        pointBorderColor: "#fff",
+        pointBorderWidth: 2,
+      },
+    ],
   };
 
-  const options: ChartOptions<"bar"> = {
+  const options: ChartOptions<"line"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -96,7 +114,7 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
       },
       title: {
         display: true,
-        text: "按月份和消费类别聚合的支出金额",
+        text: "近三月均匀消费支出趋势",
         font: {
           size: 16,
           weight: "bold",
@@ -106,6 +124,13 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
       tooltip: {
         mode: "index",
         intersect: false,
+        backgroundColor: "rgba(0, 0, 0, 0.8)",
+        titleFont: {
+          size: 13,
+        },
+        bodyFont: {
+          size: 12,
+        },
         callbacks: {
           label: function (context) {
             const value = context.parsed.y;
@@ -116,7 +141,6 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
     },
     scales: {
       x: {
-        stacked: true,
         grid: {
           display: false,
         },
@@ -127,7 +151,6 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
         },
       },
       y: {
-        stacked: true,
         beginAtZero: true,
         grid: {
           color: "rgba(0,0,0,0.1)",
@@ -146,15 +169,20 @@ const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
       mode: "index" as const,
       intersect: false,
     },
+    elements: {
+      line: {
+        tension: 0.4,
+      },
+    },
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
       <div className="h-96 w-full">
-        <Chart ref={chartRef} type="bar" data={data} options={options} />
+        <Chart ref={chartRef} type="line" data={data} options={options} />
       </div>
     </div>
   );
 };
 
-export default MonthlyExpenseChart;
+export default TrendChart;

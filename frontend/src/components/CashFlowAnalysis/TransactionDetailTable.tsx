@@ -20,8 +20,8 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { TransactionDetail } from "../services/types";
-import { formatCurrency, formatDate } from "../utils/chart-utils";
+import { TransactionDetail } from "../../services/types";
+import { formatCurrency, formatDate } from "../../utils/chart-utils";
 
 interface TransactionDetailTableProps {
   data: TransactionDetail[];

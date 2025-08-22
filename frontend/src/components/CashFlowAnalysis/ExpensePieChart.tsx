@@ -7,8 +7,8 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { expenseCategories } from "../utils/chart-utils";
-import { FinancialAggregationRecord } from "../services/types";
+import { expenseCategories } from "../../utils/chart-utils";
+import { FinancialAggregationRecord } from "../../services/types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 

@@ -3,35 +3,38 @@ import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement,
+  BarElement,
   LineElement,
+  PointElement,
   Title,
   Tooltip,
   Legend,
-  Filler,
   ChartOptions,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { FinancialAggregationRecord } from "../services/types";
+import { FinancialAggregationRecord } from "../../services/types";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  PointElement,
+  BarElement,
   LineElement,
+  PointElement,
   Title,
   Tooltip,
-  Legend,
-  Filler
+  Legend
 );
 
-interface TrendChartProps {
+interface IncomeExpenseChartProps {
   financialData: FinancialAggregationRecord[] | null;
   loading: boolean;
 }
 
-const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
-  const chartRef = useRef<ChartJS<"line">>(null);
+const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
+  financialData,
+  loading,
+}) => {
+  const chartRef = useRef<ChartJS<"bar">>(null);
 
   // 处理 loading 状态和空数据
   if (loading) {
@@ -62,43 +65,57 @@ const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
     )}`;
   });
 
+  const expenses = financialData.map((record) => {
+    return Math.abs(
+      record.housing +
+        record.dining +
+        record.living +
+        record.entertainment +
+        record.transportation +
+        record.travel +
+        record.gifts
+    );
+  });
+
   const data = {
     labels: months,
     datasets: [
       {
-        label: "近三月均匀消费支出",
-        data: financialData.map((record) => 
-          Math.abs(record.recent_avg_consumption)
-        ),
+        type: "bar" as const,
+        label: "收入",
+        data: financialData.map((record) => record.salary),
+        backgroundColor: "rgba(34, 197, 94, 0.8)",
+        borderColor: "rgb(34, 197, 94)",
+        borderWidth: 1,
+        borderRadius: 6,
+        yAxisID: "y",
+      },
+      {
+        type: "bar" as const,
+        label: "支出",
+        data: expenses,
+        backgroundColor: "rgba(239, 68, 68, 0.8)",
+        borderColor: "rgb(239, 68, 68)",
+        borderWidth: 1,
+        borderRadius: 6,
+        yAxisID: "y",
+      },
+      {
+        type: "line" as const,
+        label: "结余",
+        data: financialData.map((record) => record.balance),
         borderColor: "rgb(59, 130, 246)",
         backgroundColor: "rgba(59, 130, 246, 0.1)",
         borderWidth: 3,
-        fill: true,
         tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        pointBackgroundColor: "rgb(59, 130, 246)",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
-      },
-      {
-        label: "月均支出",
-        data: financialData.map((record) => Math.abs(record.avg_consumption)),
-        borderColor: "rgb(16, 185, 129)",
-        backgroundColor: "rgba(16, 185, 129, 0.1)",
-        borderWidth: 3,
-        fill: true,
-        tension: 0.4,
-        pointRadius: 6,
-        pointHoverRadius: 8,
-        pointBackgroundColor: "rgb(16, 185, 129)",
-        pointBorderColor: "#fff",
-        pointBorderWidth: 2,
+        pointRadius: 5,
+        pointHoverRadius: 7,
+        yAxisID: "y1",
       },
     ],
   };
 
-  const options: ChartOptions<"line"> = {
+  const options: ChartOptions<"bar" | "line"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -114,7 +131,7 @@ const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
       },
       title: {
         display: true,
-        text: "近三月均匀消费支出趋势",
+        text: "收支对比分析",
         font: {
           size: 16,
           weight: "bold",
@@ -124,13 +141,6 @@ const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
       tooltip: {
         mode: "index",
         intersect: false,
-        backgroundColor: "rgba(0, 0, 0, 0.8)",
-        titleFont: {
-          size: 13,
-        },
-        bodyFont: {
-          size: 12,
-        },
         callbacks: {
           label: function (context) {
             const value = context.parsed.y;
@@ -151,9 +161,28 @@ const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
         },
       },
       y: {
+        type: "linear",
+        display: true,
+        position: "left",
         beginAtZero: true,
         grid: {
           color: "rgba(0,0,0,0.1)",
+        },
+        ticks: {
+          font: {
+            size: 11,
+          },
+          callback: function (value) {
+            return "¥" + (value as number).toLocaleString();
+          },
+        },
+      },
+      y1: {
+        type: "linear",
+        display: true,
+        position: "right",
+        grid: {
+          drawOnChartArea: false,
         },
         ticks: {
           font: {
@@ -169,20 +198,15 @@ const TrendChart: React.FC<TrendChartProps> = ({ financialData, loading }) => {
       mode: "index" as const,
       intersect: false,
     },
-    elements: {
-      line: {
-        tension: 0.4,
-      },
-    },
   };
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
       <div className="h-96 w-full">
-        <Chart ref={chartRef} type="line" data={data} options={options} />
+        <Chart ref={chartRef} type="bar" data={data} options={options} />
       </div>
     </div>
   );
 };
 
-export default TrendChart;
+export default IncomeExpenseChart;

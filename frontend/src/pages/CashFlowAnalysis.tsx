@@ -7,14 +7,14 @@ import {
   Table,
   FileText,
 } from "lucide-react";
-import Overview from "../components/Overview";
-import MonthlyExpenseChart from "../components/MonthlyExpenseChart";
-import TrendChart from "../components/TrendChart";
-import ExpensePieChart from "../components/ExpensePieChart";
-import IncomeExpenseChart from "../components/IncomeExpenseChart";
-import FinancialDataTable from "../components/FinancialDataTable";
-import TransactionDetailTable from "../components/TransactionDetailTable";
-import TimeRangeSelector, { TimeRange } from "../components/TimeRangeSelector";
+import Overview from "../components/CashFlowAnalysis/Overview";
+import MonthlyExpenseChart from "../components/CashFlowAnalysis/MonthlyExpenseChart";
+import TrendChart from "../components/CashFlowAnalysis/TrendChart";
+import ExpensePieChart from "../components/CashFlowAnalysis/ExpensePieChart";
+import IncomeExpenseChart from "../components/CashFlowAnalysis/IncomeExpenseChart";
+import FinancialDataTable from "../components/CashFlowAnalysis/FinancialDataTable";
+import TransactionDetailTable from "../components/CashFlowAnalysis/TransactionDetailTable";
+import TimeRangeSelector, { TimeRange } from "../components/CashFlowAnalysis/TimeRangeSelector";
 import {
   useGetFinancialAggregationRecords,
   useGetAllFinancialRecords,
@@ -29,7 +29,7 @@ import {
 /**
  * 财务管理仪表板
  */
-const Dashboard: React.FC = () => {
+const CashFlowAnalysis: React.FC = () => {
   const [timeRange, setTimeRange] = useState<TimeRange>("all");
   const [activeTab, setActiveTab] = useState<"overview" | "transactions">(
     "overview"
@@ -71,46 +71,25 @@ const Dashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-      {/* 头部导航 */}
-      <header className="bg-white shadow-lg border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center space-x-3">
-              <div className="p-2 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg">
-                <Wallet className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">
-                  财务分析报表
-                </h1>
-                <p className="text-sm text-gray-600">个人收支流水分析</p>
-              </div>
+      {/* 主体内容 */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* 页面标题和控制区域 */}
+        <div className="mb-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div className="mb-4 lg:mb-0">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">现金流分析</h1>
+              <p className="text-gray-600 flex items-center space-x-2">
+                <BarChart3 className="w-4 h-4" />
+                <span>数据范围: {formatDateRangeText(timeRange, allData || undefined)}</span>
+              </p>
             </div>
-            <div className="hidden md:flex items-center space-x-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">
               <TimeRangeSelector
                 value={timeRange}
                 onChange={handleTimeRangeChange}
               />
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <BarChart3 className="w-4 h-4" />
-                <span>
-                  数据范围:{" "}
-                  {formatDateRangeText(timeRange, allData || undefined)}
-                </span>
-              </div>
             </div>
           </div>
-        </div>
-      </header>
-
-      {/* 主体内容 */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* 移动端时间范围选择器 */}
-        <div className="mb-6 md:hidden">
-          <TimeRangeSelector
-            value={timeRange}
-            onChange={handleTimeRangeChange}
-          />
         </div>
 
         {/* Tab 导航 */}
@@ -278,4 +257,4 @@ const Dashboard: React.FC = () => {
   );
 };
 
-export default Dashboard;
+export default CashFlowAnalysis;

@@ -4,33 +4,30 @@ import {
   CategoryScale,
   LinearScale,
   BarElement,
-  LineElement,
-  PointElement,
   Title,
   Tooltip,
   Legend,
   ChartOptions,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { FinancialAggregationRecord } from "../services/types";
+import { expenseCategories } from "../../utils/chart-utils";
+import { FinancialAggregationRecord } from "../../services/types";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
   BarElement,
-  LineElement,
-  PointElement,
   Title,
   Tooltip,
   Legend
 );
 
-interface IncomeExpenseChartProps {
+interface MonthlyExpenseChartProps {
   financialData: FinancialAggregationRecord[] | null;
   loading: boolean;
 }
 
-const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
+const MonthlyExpenseChart: React.FC<MonthlyExpenseChartProps> = ({
   financialData,
   loading,
 }) => {
@@ -57,6 +54,7 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
     );
   }
 
+  // 准备数据：按月份和消费类别聚合
   const months = financialData.map((record) => {
     const date = new Date(record.month_date);
     return `${date.getFullYear()}/${String(date.getMonth() + 1).padStart(
@@ -65,57 +63,24 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
     )}`;
   });
 
-  const expenses = financialData.map((record) => {
-    return Math.abs(
-      record.housing +
-        record.dining +
-        record.living +
-        record.entertainment +
-        record.transportation +
-        record.travel +
-        record.gifts
-    );
-  });
+  const datasets = expenseCategories.map((category) => ({
+    label: category.label,
+    data: financialData.map(
+      (record) => record[category.key as keyof typeof record] as number
+    ),
+    backgroundColor: category.color,
+    borderColor: category.color,
+    borderWidth: 1,
+    borderRadius: 6,
+    borderSkipped: false,
+  }));
 
   const data = {
     labels: months,
-    datasets: [
-      {
-        type: "bar" as const,
-        label: "收入",
-        data: financialData.map((record) => record.salary),
-        backgroundColor: "rgba(34, 197, 94, 0.8)",
-        borderColor: "rgb(34, 197, 94)",
-        borderWidth: 1,
-        borderRadius: 6,
-        yAxisID: "y",
-      },
-      {
-        type: "bar" as const,
-        label: "支出",
-        data: expenses,
-        backgroundColor: "rgba(239, 68, 68, 0.8)",
-        borderColor: "rgb(239, 68, 68)",
-        borderWidth: 1,
-        borderRadius: 6,
-        yAxisID: "y",
-      },
-      {
-        type: "line" as const,
-        label: "结余",
-        data: financialData.map((record) => record.balance),
-        borderColor: "rgb(59, 130, 246)",
-        backgroundColor: "rgba(59, 130, 246, 0.1)",
-        borderWidth: 3,
-        tension: 0.4,
-        pointRadius: 5,
-        pointHoverRadius: 7,
-        yAxisID: "y1",
-      },
-    ],
+    datasets,
   };
 
-  const options: ChartOptions<"bar" | "line"> = {
+  const options: ChartOptions<"bar"> = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
@@ -131,7 +96,7 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
       },
       title: {
         display: true,
-        text: "收支对比分析",
+        text: "按月份和消费类别聚合的支出金额",
         font: {
           size: 16,
           weight: "bold",
@@ -151,6 +116,7 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
     },
     scales: {
       x: {
+        stacked: true,
         grid: {
           display: false,
         },
@@ -161,28 +127,10 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
         },
       },
       y: {
-        type: "linear",
-        display: true,
-        position: "left",
+        stacked: true,
         beginAtZero: true,
         grid: {
           color: "rgba(0,0,0,0.1)",
-        },
-        ticks: {
-          font: {
-            size: 11,
-          },
-          callback: function (value) {
-            return "¥" + (value as number).toLocaleString();
-          },
-        },
-      },
-      y1: {
-        type: "linear",
-        display: true,
-        position: "right",
-        grid: {
-          drawOnChartArea: false,
         },
         ticks: {
           font: {
@@ -209,4 +157,4 @@ const IncomeExpenseChart: React.FC<IncomeExpenseChartProps> = ({
   );
 };
 
-export default IncomeExpenseChart;
+export default MonthlyExpenseChart;
