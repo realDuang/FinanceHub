@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import { TrendingUp } from "lucide-react";
 import CashFlowAnalysis from "./pages/CashFlowAnalysis";
 import BalanceSheet from "./pages/BalanceSheet";
@@ -21,7 +26,9 @@ function App() {
                   <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-800 to-gray-600 bg-clip-text text-transparent">
                     FinanceHub
                   </h1>
-                  <p className="text-sm text-gray-500 -mt-1">智能财务分析平台</p>
+                  <p className="text-sm text-gray-500 -mt-1">
+                    智能财务分析平台
+                  </p>
                 </div>
               </div>
 
@@ -34,9 +41,15 @@ function App() {
         {/* 页面内容 */}
         <main>
           <Routes>
-            <Route path="/" element={<Navigate to="/balance-sheet" replace />} />
+            <Route
+              path="/"
+              element={<Navigate to="/balance-sheet" replace />}
+            />
             <Route path="/balance-sheet/*" element={<BalanceSheet />} />
-            <Route path="/cash-flow-analysis/*" element={<CashFlowAnalysis />} />
+            <Route
+              path="/cash-flow-analysis/*"
+              element={<CashFlowAnalysis />}
+            />
           </Routes>
         </main>
       </div>

@@ -138,80 +138,34 @@ flowchart TD
 
 ## 📊 功能特性
 
-### 数据管理
+### 核心功能模块
 
-- ✅ CSV 文件导入
-- ✅ 自动数据验证
-- ✅ 数据库存储
-- ✅ 数据备份与恢复
+#### 💰 现金流分析 (Cash Flow Analysis)
 
-### 数据分析
+- ✅ **交易记录管理**：支持交易明细的增删改查
+- ✅ **多维度筛选**：按日期、类别、金额、支付方式等条件筛选
+- ✅ **数据导入导出**：支持 CSV 格式的批量导入和导出
+- ✅ **收支分析**：月度/年度收入支出统计和趋势分析
+- ✅ **分类统计**：按消费类别（餐饮、交通、住房等）进行统计分析
 
-- ✅ 月度收支分析
-- ✅ 年度对比分析
-- ✅ 类别趋势分析
-- ✅ 支出排行榜
-- ✅ 结余趋势分析
+#### 📊 资产负债表 (Balance Sheet)
 
-### 数据可视化
+- ✅ **资产管理**：支持各类资产的记录和管理
+- ✅ **负债管理**：支持负债信息的录入和跟踪
+- ✅ **净资产计算**：自动计算净资产和资产分布
+- ✅ **可视化展示**：资产分布饼图、净资产趋势图
 
-- 📊 收支趋势图表
-- 📈 类别对比图表
-- 🥧 支出分布饼图
-- 📉 结余变化曲线
-- 📋 数据汇总表格
+## 📋 API 接口文档
 
-## 🏗️ 项目结构
-
-```
-visualize-balance-management-tool/
-├── frontend/                    # React前端应用
-│   ├── src/
-│   │   ├── components/         # 可复用组件
-│   │   ├── pages/             # 页面组件
-│   │   ├── services/          # API服务
-│   │   ├── hooks/             # 自定义Hooks
-│   │   ├── contexts/          # React上下文
-│   │   ├── utils/             # 工具函数
-│   │   └── styles/            # 样式文件
-│   ├── public/                # 静态资源
-│   └── package.json           # 依赖配置
-│
-├── backend/                     # Python后端应用
-│   ├── app/
-│   │   ├── api/               # API路由
-│   │   ├── models/            # 数据模型
-│   │   ├── services/          # 业务逻辑
-│   │   ├── database/          # 数据库配置
-│   │   └── utils/             # 工具函数
-│   ├── scripts/               # 辅助脚本
-│   ├── tests/                 # 测试文件
-│   ├── main.py                # 应用入口
-│   └── requirements.txt       # Python依赖
-│
-├── dataset.csv                  # 示例数据文件
-├── start.sh                    # 快速启动脚本
-├── docker-compose.yml          # Docker编排文件
-└── README.md                   # 项目说明
-```
-
-## 🎯 API 端点
-
-### 财务记录查询
-
-- `GET /api/v1/records` - 获取所有记录（分页）
-- `GET /api/v1/records/year/{year}` - 按年份查询
-- `GET /api/v1/records/range` - 按日期范围查询
-
-### 数据分析
-
-- `GET /api/v1/analysis/category-trends/{category}` - 类别趋势
-- `GET /api/v1/analysis/monthly-breakdown/{month_date}` - 月度分解
-- `GET /api/v1/analysis/year-comparison` - 年度对比
-- `GET /api/v1/analysis/top-expenses` - 支出排行
-- `GET /api/v1/analysis/balance-trend` - 结余趋势
+> 📖 详细 API 文档请访问：`http://localhost:8000/docs` (Swagger UI)
 
 ## 🚦 快速开始
+
+### 系统要求
+
+- **Node.js**: 18.0+
+- **Python**: 3.11+
+- **Conda**: 推荐使用 (也可使用 pip + venv)
 
 ### 方式一：使用启动脚本（推荐）
 
@@ -220,9 +174,18 @@ visualize-balance-management-tool/
 git clone <repository-url>
 cd visualize-balance-management-tool
 
-# 一键启动
+# 一键启动（自动创建conda环境并启动前后端）
+chmod +x start.sh
 ./start.sh
 ```
+
+启动脚本会自动：
+
+- 创建并激活 conda 环境 `financial-tool`
+- 安装 Python 依赖
+- 安装 Node.js 依赖
+- 启动后端服务 (端口 8000)
+- 启动前端服务 (端口 5173)
 
 ### 方式二：手动启动
 
@@ -231,18 +194,23 @@ cd visualize-balance-management-tool
 ```bash
 cd backend
 
-# 创建虚拟环境
+# 方法1: 使用conda (推荐)
+conda create -n financial-tool python=3.11
+conda activate financial-tool
+pip install -r requirements.txt
+
+# 方法2: 使用venv
 python3 -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
-
-# 安装依赖
 pip install -r requirements.txt
 
 # 导入示例数据（可选）
-python scripts/import_transaction_data.py ../dataset.csv
+python scripts/import_transaction_data.py data/financial_flow.csv
 
 # 启动后端服务
 python main.py
+# 服务地址: http://localhost:8000
+# API文档: http://localhost:8000/docs
 ```
 
 #### 前端设置
@@ -255,47 +223,95 @@ npm install
 
 # 启动开发服务器
 npm run dev
+# 访问地址: http://localhost:5173
 ```
+
+### 🔗 访问地址
+
+- **前端应用**: http://localhost:5173
+- **后端 API**: http://localhost:8000
+- **API 文档**: http://localhost:8000/docs
+- **健康检查**: http://localhost:8000/api/v1/health
+
+### 📊 页面功能
+
+1. **现金流分析** (`/cash-flow`)
+
+   - 收支趋势图表
+   - 分类支出分析
+   - 数据筛选和导入导出
+
+2. **资产负债表** (`/balance-sheet`)
+   - 资产管理
+   - 负债管理
+   - 净资产可视化
 
 ## 📈 数据格式
 
-CSV 文件应包含以下列（按顺序）：
+### CSV 导入格式
 
-1. **月度** - 日期格式：YYYY/M/D
-2. **住房** - 住房支出
-3. **餐饮** - 餐饮支出
-4. **生活** - 生活支出
-5. **娱乐** - 娱乐支出
-6. **交通** - 交通支出
-7. **旅行** - 旅行支出
-8. **礼物** - 礼物支出
-9. **交易** - 交易收入/支出
-10. **人情** - 人情支出
-11. **工资** - 工资收入
-12. **结余** - 月度结余
-13. **均匀消费支出** - 房租均摊
-14. **近三月均匀消费支出** - 近期平均支出
+包含以下字段：
 
-## 📝 开发指南
+- **日期** (transaction_date) - 格式：YYYY-MM-DD
+- **金额** (amount) - 数值格式，支持负数
+- **类别** (category) - 如：餐饮、交通、住房、娱乐等
+- **描述** (description) - 交易描述
+- **收支类型** (income_expense_type) - 收入/支出
+- **支付方式** (payment_method) - 支付宝、微信支付等
+- **交易对手** (counterparty) - 商户或个人名称
 
-### 添加新的 API 端点
+### 数据导入功能
 
-1. 在 `backend/app/models/` 中定义数据模型
-2. 在 `backend/app/services/` 中实现业务逻辑
-3. 在 `backend/app/schemas.py` 中定义 Pydantic 模型
-4. 在 `backend/app/api/routes.py` 中添加路由
-5. 在 `frontend/src/services/api.js` 中添加 API 调用
-6. 在 `frontend/src/hooks/useApi.js` 中创建 Hook
+- ✅ **自动去重**：避免重复导入相同交易
+- ✅ **数据验证**：自动检查数据格式和完整性
+- ✅ **错误提示**：详细的导入错误信息
+- ✅ **模板下载**：提供标准 CSV 模板下载
+- ✅ **批量导入**：支持大量数据的批量处理
 
-### 添加新的图表组件
+### 示例数据
 
-1. 在 `frontend/src/components/` 中创建图表组件
-2. 使用 Chart.js 和 react-chartjs-2
-3. 在页面中引入并使用组件
+导入功能提供了模板 csv，可作为参考。
 
-## 📄 许可证
+更丰富导详细的账单自动化导入，请移步我的另一个项目 [auto-bookkeeping](https://github.com/realDuang/auto-bookkeeping)
 
-MIT License - 详见 [LICENSE](LICENSE) 文件
+## � 开发状态
+
+### ✅ 已完成功能
+
+- [x] 基础项目架构搭建
+- [x] 后端 API 服务 (FastAPI)
+- [x] 前端界面框架 (React + TypeScript)
+- [x] 数据库设计和 ORM (SQLAlchemy)
+- [x] 交易记录 CRUD 操作
+- [x] 资产负债表管理
+- [x] CSV 数据导入导出
+- [x] 基础数据可视化图表
+- [x] 响应式界面设计
+- [x] API 文档生成
+
+### 🔄 进行中功能
+
+- [ ] 高级数据筛选和搜索
+- [ ] 更多图表类型和交互功能
+- [ ] 数据聚合和统计分析优化
+- [ ] 用户体验改进
+
+### 📋 待开发功能
+
+- [ ] **投资账户管理**：股票、基金等投资数据
+- [ ] **预算管理**：设置和跟踪预算目标
+- [ ] **定期报告**：自动生成财务分析报告
+- [ ] **数据备份**：自动数据备份和恢复
+- [ ] **多用户支持**：用户认证和数据隔离
+- [ ] **移动端适配**：PWA 支持
+- [ ] **AI 功能**：智能分类和趋势预测
+- [ ] **第三方集成**：银行 API、记账软件同步
+
+## 🐛 已知问题
+
+- CSV 导入时的中文编码兼容性需要改进
+- 大数据量时的前端性能优化
+- 某些图表在小屏幕设备上的显示效果
 
 ## 🤝 贡献
 
