@@ -43,23 +43,23 @@ cd backend
 echo "📦 安装Python依赖..."
 pip install -r requirements.txt
 
-# 提示用户是否导入初始数据
-read -p "是否更新数据源? (y/n): " IMPORT_DATA
-if [[ "$IMPORT_DATA" == "y" ]]; then
-    # 如果有数据文件，导入数据
-    if [ -f "data/financial_flow.csv" ]; then
-        echo "📊 导入消费交易流水数据..."
-        python scripts/import_transaction_data.py data/financial_flow.csv
-    else
-        echo "❌ 数据文件 data/financial_flow.csv 不存在，跳过"
-        exit 1
-    fi
+# # 提示用户是否导入初始数据
+# read -p "是否更新数据源? (y/n): " IMPORT_DATA
+# if [[ "$IMPORT_DATA" == "y" ]]; then
+#     # 如果有数据文件，导入数据
+#     if [ -f "data/financial_flow.csv" ]; then
+#         echo "📊 导入消费交易流水数据..."
+#         python scripts/import_transaction_data.py data/financial_flow.csv
+#     else
+#         echo "❌ 数据文件 data/financial_flow.csv 不存在，跳过"
+#         exit 1
+#     fi
 
-    echo "🔄 聚合月度财务数据..."
-    python scripts/aggregate_data.py
+#     echo "🔄 聚合月度财务数据..."
+#     python scripts/aggregate_data.py
 
-    echo "✅ 数据导入和聚合完成！"
-fi
+#     echo "✅ 数据导入和聚合完成！"
+# fi
 
 # 设置前端
 echo "🎨 设置前端环境..."

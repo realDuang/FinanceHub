@@ -1,13 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Query
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 import tempfile
 import os
+import io
 
 from app.database.connection import get_db
 from app.services.analyze.financial_service import FinancialService
 from app.services.analyze.transaction_service import TransactionService
 from app.services.balance_sheet_service import BalanceSheetService
+from app.services.transaction_import_export_service import TransactionImportExportService
 from app import schemas
 
 router = APIRouter()
@@ -210,3 +213,92 @@ def health_check():
     健康检查
     """
     return {"status": "healthy", "message": "财务管理API运行正常"}
+
+
+# =================================
+# 交易明细导入导出 API
+# =================================
+
+@router.get("/transactions/export")
+def export_transactions_csv(
+    start_date: Optional[str] = Query(default=None, description="开始日期，格式：YYYY-MM-DD"),
+    end_date: Optional[str] = Query(default=None, description="结束日期，格式：YYYY-MM-DD"),
+    db: Session = Depends(get_db)
+):
+    """
+    导出交易明细为CSV文件
+    """
+    try:
+        csv_content = TransactionImportExportService.export_to_csv(
+            db=db,
+            start_date=start_date,
+            end_date=end_date
+        )
+        
+        # 生成文件名
+        filename = "transactions"
+        if start_date and end_date:
+            filename += f"_{start_date}_to_{end_date}"
+        elif start_date:
+            filename += f"_from_{start_date}"
+        elif end_date:
+            filename += f"_to_{end_date}"
+        filename += ".csv"
+        
+        # 返回CSV文件
+        return StreamingResponse(
+            io.StringIO(csv_content),
+            media_type="text/csv",
+            headers={"Content-Disposition": f"attachment; filename={filename}"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"导出交易明细失败: {str(e)}")
+
+
+@router.post("/transactions/import")
+def import_transactions_csv(
+    file: UploadFile = File(...),
+    enable_deduplication: bool = Query(default=True, description="是否启用去重"),
+    db: Session = Depends(get_db)
+):
+    """
+    从CSV文件导入交易明细
+    """
+    try:
+        # 验证文件类型
+        if not file.filename.endswith('.csv'):
+            raise HTTPException(status_code=400, detail="只支持CSV文件格式")
+        
+        # 读取文件内容
+        csv_content = file.file.read().decode('utf-8')
+        
+        # 导入数据
+        result = TransactionImportExportService.import_from_csv(
+            db=db,
+            csv_content=csv_content,
+            enable_deduplication=enable_deduplication
+        )
+        
+        return result
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"导入交易明细失败: {str(e)}")
+
+
+@router.get("/transactions/template")
+def get_csv_template():
+    """
+    获取CSV导入模板
+    """
+    try:
+        csv_content = TransactionImportExportService.get_csv_template()
+        
+        return StreamingResponse(
+            io.StringIO(csv_content),
+            media_type="text/csv",
+            headers={"Content-Disposition": "attachment; filename=transaction_template.csv"}
+        )
+        
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取CSV模板失败: {str(e)}")
