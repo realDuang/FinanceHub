@@ -10,7 +10,7 @@ app = FastAPI(
     description="一个用于财务数据管理和可视化的后端API服务",
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # 配置CORS中间件
@@ -28,6 +28,7 @@ create_tables()
 # 包含API路由
 app.include_router(router, prefix="/api/v1", tags=["财务管理"])
 
+
 @app.get("/")
 async def root():
     """根路径"""
@@ -35,12 +36,13 @@ async def root():
         "message": "财务可视化管理工具 API",
         "version": "1.0.0",
         "docs": "/docs",
-        "health": "/api/v1/health"
+        "health": "/api/v1/health",
     }
+
 
 if __name__ == "__main__":
     import uvicorn
-    
+
     # 获取配置
     host = os.getenv("VITE_SERVER_HOST", "0.0.0.0")
     port = int(os.getenv("VITE_SERVER_PORT", 8000))
@@ -48,11 +50,5 @@ if __name__ == "__main__":
 
     print(f"🚀 启动服务器: http://{host}:{port}")
     print(f"📖 API文档: http://{host}:{port}/docs")
-    
-    uvicorn.run(
-        "main:app",
-        host=host,
-        port=port,
-        reload=debug,
-        access_log=True
-    )
+
+    uvicorn.run("main:app", host=host, port=port, reload=debug, access_log=True)

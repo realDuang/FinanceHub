@@ -5,12 +5,14 @@ from typing import List, Optional
 import tempfile
 import os
 import io
+import json
 
 from app.database.connection import get_db
 from app.services.analyze.financial_service import FinancialService
 from app.services.analyze.transaction_service import TransactionService
 from app.services.balance_sheet_service import BalanceSheetService
 from app.services.transaction_import_export_service import TransactionImportExportService
+from app.services.bill_parser_service import BillParser, BillParserError
 from app import schemas
 
 router = APIRouter()
@@ -284,6 +286,96 @@ def import_transactions_csv(
         
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"导入交易明细失败: {str(e)}")
+
+
+@router.post("/transactions/import/alipay-bill")
+def import_alipay_bill(
+    file: UploadFile = File(...),
+    enable_deduplication: bool = Query(default=True, description="是否启用去重"),
+    db: Session = Depends(get_db)
+):
+    """导入支付宝账单"""
+    return _import_payment_bill(
+        file=file,
+        db=db,
+        enable_deduplication=enable_deduplication,
+        expected_formats={"alipay"},
+        interface_name="支付宝"
+    )
+
+
+@router.post("/transactions/import/wechat-bill")
+def import_wechat_bill(
+    file: UploadFile = File(...),
+    enable_deduplication: bool = Query(default=True, description="是否启用去重"),
+    db: Session = Depends(get_db)
+):
+    """导入微信支付账单"""
+    return _import_payment_bill(
+        file=file,
+        db=db,
+        enable_deduplication=enable_deduplication,
+        expected_formats={"wechat", "wechat_xlsx"},
+        interface_name="微信支付"
+    )
+
+
+def _import_payment_bill(
+    *,
+    file: UploadFile,
+    db: Session,
+    enable_deduplication: bool,
+    expected_formats: set[str],
+    interface_name: str
+):
+    try:
+        _ = enable_deduplication  # 保留参数以兼容现有前端调用
+        file_bytes = file.file.read()
+        if not file_bytes:
+            raise HTTPException(status_code=400, detail="上传文件为空")
+
+        parse_result = BillParser.parse(file_bytes, file.filename)
+        detected_format = parse_result.details.get("format")
+
+        if detected_format not in expected_formats:
+            expected_desc = "或".join(sorted(expected_formats))
+            raise HTTPException(
+                status_code=400,
+                detail=f"文件格式与{interface_name}接口不匹配，检测到: {detected_format or '未知'} (期望: {expected_desc})"
+            )
+
+        csv_buffer = io.StringIO()
+        parse_result.dataframe.to_csv(csv_buffer, index=False, encoding="utf-8-sig")
+        csv_bytes = csv_buffer.getvalue().encode("utf-8-sig")
+        csv_stream = io.BytesIO(csv_bytes)
+
+        original_name = (file.filename or f"{interface_name}_bill").strip() or "bill"
+        base_name, _ = os.path.splitext(original_name)
+        safe_base = base_name or "bill"
+        normalized_filename = f"{safe_base}_normalized.csv"
+
+        from urllib.parse import quote
+
+        ascii_fallback = "bill_normalized.csv"
+        encoded_filename = quote(normalized_filename)
+        content_disposition = (
+            f"attachment; filename={ascii_fallback}; filename*=UTF-8''{encoded_filename}"
+        )
+
+        headers = {
+            "Content-Disposition": content_disposition,
+            "X-Parser-Details": json.dumps(parse_result.details, ensure_ascii=True)
+        }
+
+        csv_stream.seek(0)
+        return StreamingResponse(csv_stream, media_type="text/csv; charset=utf-8", headers=headers)
+
+    except BillParserError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"导入{interface_name}账单失败: {str(e)}")
 
 
 @router.get("/transactions/template")

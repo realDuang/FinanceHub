@@ -4,8 +4,7 @@
 """
 
 import pandas as pd
-import os
-from datetime import datetime, date
+from datetime import datetime
 from typing import Optional, List, Dict, Any
 from sqlalchemy.orm import Session
 from sqlalchemy import and_
@@ -147,16 +146,52 @@ class TransactionImportExportService:
             导入结果统计
         """
         try:
-            # 读取CSV数据
-            if csv_content:
+            if csv_content is not None:
                 df = pd.read_csv(StringIO(csv_content), encoding='utf-8')
             elif csv_file_path:
                 df = pd.read_csv(csv_file_path, encoding='utf-8')
             else:
                 raise ValueError("必须提供csv_content或csv_file_path")
-            
-            # 验证CSV格式
-            validation_result = TransactionImportExportService._validate_csv_format(df)
+        except Exception as e:
+            return {
+                "success": False,
+                "message": f"读取CSV失败: {str(e)}",
+                "imported_count": 0,
+                "skipped_count": 0,
+                "duplicate_count": 0,
+                "error_details": [],
+                "duplicate_details": []
+            }
+
+        return TransactionImportExportService._import_dataframe(
+            db=db,
+            df=df,
+            enable_deduplication=enable_deduplication
+        )
+
+    @staticmethod
+    def import_from_dataframe(
+        db: Session,
+        df: pd.DataFrame,
+        enable_deduplication: bool = True
+    ) -> Dict[str, Any]:
+        """从已经准备好的DataFrame导入交易明细数据。"""
+        return TransactionImportExportService._import_dataframe(
+            db=db,
+            df=df,
+            enable_deduplication=enable_deduplication
+        )
+
+    @staticmethod
+    def _import_dataframe(
+        db: Session,
+        df: pd.DataFrame,
+        enable_deduplication: bool = True
+    ) -> Dict[str, Any]:
+        try:
+            working_df = df.copy()
+
+            validation_result = TransactionImportExportService._validate_csv_format(working_df)
             if not validation_result["valid"]:
                 return {
                     "success": False,
@@ -167,60 +202,53 @@ class TransactionImportExportService:
                     "error_details": [],
                     "duplicate_details": []
                 }
-            
+
             imported_count = 0
             skipped_count = 0
             duplicate_count = 0
-            error_details = []
-            duplicate_details = []
-            
-            # 处理每一行数据
-            for index, row in df.iterrows():
+            error_details: List[Dict[str, Any]] = []
+            duplicate_details: List[Dict[str, Any]] = []
+
+            for index, row in working_df.iterrows():
                 try:
-                    # 验证必需字段
                     required_fields = ["交易时间", "类型", "金额", "收支"]
                     for field in required_fields:
                         if TransactionImportExportService._is_empty_value(row[field]):
                             raise ValueError(f"必需字段 '{field}' 为空")
-                    
-                    # 解析交易时间
+
                     try:
                         transaction_time = pd.to_datetime(row["交易时间"])
                     except Exception as e:
                         raise ValueError(f"交易时间格式错误: {str(e)}")
-                    
-                    # 验证金额
+
                     try:
                         amount = float(row["金额"])
                         if amount < 0:
                             raise ValueError("金额不能为负数")
                     except ValueError as e:
                         if "could not convert" in str(e) or "invalid literal" in str(e):
-                            raise ValueError(f"金额格式错误，必须为数字")
+                            raise ValueError("金额格式错误，必须为数字")
                         raise e
-                    
-                    # 验证类型和收支类型
+
                     category = TransactionImportExportService._clean_string_value(row["类型"])
                     income_expense_type = TransactionImportExportService._clean_string_value(row["收支"])
-                    
+
                     if not category:
                         raise ValueError("交易类型不能为空")
                     if not income_expense_type:
                         raise ValueError("收支类型不能为空")
-                    
-                    # 检查去重
+
                     if enable_deduplication:
-                        # 先清理字段值
                         counterparty_for_check = TransactionImportExportService._clean_string_value(row["交易对方"])
                         item_name_for_check = TransactionImportExportService._clean_string_value(row["商品名称"])
-                        
+
                         is_duplicate = TransactionImportExportService._check_duplicate(
                             db, transaction_time, amount, counterparty_for_check, item_name_for_check
                         )
                         if is_duplicate:
                             duplicate_count += 1
                             duplicate_details.append({
-                                "row": index + 2,  # CSV文件中的行号（包含标题行）
+                                "row": index + 2,
                                 "transaction_time": str(transaction_time),
                                 "amount": amount,
                                 "counterparty": TransactionImportExportService._clean_string_value(row["交易对方"]),
@@ -228,13 +256,12 @@ class TransactionImportExportService:
                                 "reason": "数据重复：相同时间、金额、交易对方和商品名称的记录已存在"
                             })
                             continue
-                    
-                    # 创建交易记录
+
                     payment_method = TransactionImportExportService._clean_string_value(row["支付方式"])
                     counterparty = TransactionImportExportService._clean_string_value(row["交易对方"])
                     item_name = TransactionImportExportService._clean_string_value(row["商品名称"])
                     remarks = TransactionImportExportService._clean_string_value(row["备注"])
-                    
+
                     transaction = TransactionDetail(
                         transaction_time=transaction_time,
                         category=category,
@@ -245,18 +272,16 @@ class TransactionImportExportService:
                         item_name=item_name if item_name else None,
                         remarks=remarks if remarks else None
                     )
-                    
+
                     db.add(transaction)
                     imported_count += 1
-                    
+
                 except Exception as e:
                     error_message = str(e)
                     print(f"处理第{index+2}行数据失败: {error_message}")
                     skipped_count += 1
-                    
-                    # 记录错误详情
                     error_details.append({
-                        "row": index + 2,  # CSV文件中的行号（包含标题行）
+                        "row": index + 2,
                         "data": {
                             "交易时间": str(row.get("交易时间", "")),
                             "类型": str(row.get("类型", "")),
@@ -270,13 +295,10 @@ class TransactionImportExportService:
                         "reason": error_message
                     })
                     continue
-            
-            # 提交事务
+
             db.commit()
-            
-            # 重新聚合财务数据
             TransactionImportExportService._refresh_financial_aggregation(db)
-            
+
             return {
                 "success": True,
                 "message": "数据导入成功",
@@ -286,7 +308,7 @@ class TransactionImportExportService:
                 "error_details": error_details,
                 "duplicate_details": duplicate_details
             }
-            
+
         except Exception as e:
             db.rollback()
             return {

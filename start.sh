@@ -72,12 +72,12 @@ cd ..
 echo "✅ 环境初始化完成"
 
 # 提示用户是否启动服务
-read -p "是否启动服务? (y/n): " START_SERVICE
-if [[ "$START_SERVICE" != "y" ]]; then
-    echo "❌ 服务未启动"
-    conda deactivate
-    exit 0
-fi
+# read -p "是否启动服务? (y/n): " START_SERVICE
+# if [[ "$START_SERVICE" != "y" ]]; then
+#     echo "❌ 服务未启动"
+#     conda deactivate
+#     exit 0
+# fi
 
 # 启动后端服务
 echo "🌐 启动后端服务..."
