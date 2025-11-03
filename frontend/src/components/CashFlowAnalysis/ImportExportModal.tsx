@@ -1,5 +1,16 @@
 import React, { useState } from "react";
-import { Upload, Download, FileText, CheckCircle, AlertCircle, X, ChevronDown, ChevronUp, CreditCard, Smartphone } from "lucide-react";
+import {
+  Upload,
+  Download,
+  FileText,
+  CheckCircle,
+  AlertCircle,
+  X,
+  ChevronDown,
+  ChevronUp,
+  CreditCard,
+  Smartphone,
+} from "lucide-react";
 import { API_BASE_URL } from "../../services/constants";
 
 interface ImportExportModalProps {
@@ -53,8 +64,12 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   const [dragActive, setDragActive] = useState(false);
   const [showErrorDetails, setShowErrorDetails] = useState(false);
   const [showDuplicateDetails, setShowDuplicateDetails] = useState(false);
-  const [importMetadata, setImportMetadata] = useState<ImportResult["parser_details"] | null>(null);
-  const [currentImportLabel, setCurrentImportLabel] = useState<string | null>(null);
+  const [importMetadata, setImportMetadata] = useState<
+    ImportResult["parser_details"] | null
+  >(null);
+  const [currentImportLabel, setCurrentImportLabel] = useState<string | null>(
+    null
+  );
 
   // 当模态框打开时，重置为默认选项卡
   React.useEffect(() => {
@@ -76,8 +91,10 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       if (startDate) params.append("start_date", startDate);
       if (endDate) params.append("end_date", endDate);
 
-      const response = await fetch(`${API_BASE_URL}/transactions/export?${params.toString()}`);
-      
+      const response = await fetch(
+        `${API_BASE_URL}/transactions/export?${params.toString()}`
+      );
+
       if (!response.ok) {
         throw new Error("导出失败");
       }
@@ -86,7 +103,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      
+
       // 从响应头获取文件名，或使用默认文件名
       const contentDisposition = response.headers.get("content-disposition");
       let filename = "transactions.csv";
@@ -96,7 +113,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
           filename = filenameMatch[1];
         }
       }
-      
+
       link.download = filename;
       document.body.appendChild(link);
       link.click();
@@ -111,7 +128,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   const handleDownloadTemplate = async () => {
     try {
       const response = await fetch(`${API_BASE_URL}/transactions/template`);
-      
+
       if (!response.ok) {
         throw new Error("下载模板失败");
       }
@@ -155,7 +172,10 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       const resultPayload = await response.json();
 
       if (!response.ok) {
-        const errorMessage = resultPayload?.detail || resultPayload?.message || "导入失败，请检查文件内容";
+        const errorMessage =
+          resultPayload?.detail ||
+          resultPayload?.message ||
+          "导入失败，请检查文件内容";
         throw new Error(errorMessage);
       }
 
@@ -168,7 +188,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       }
     } catch (error) {
       console.error("导入失败:", error);
-      const message = error instanceof Error ? error.message : "导入失败，请重试";
+      const message =
+        error instanceof Error ? error.message : "导入失败，请重试";
       setImportResult({
         success: false,
         message,
@@ -176,7 +197,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
         skipped_count: 0,
         duplicate_count: 0,
         error_details: [],
-        duplicate_details: []
+        duplicate_details: [],
       });
       setImportMetadata(null);
     } finally {
@@ -185,9 +206,13 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
     }
   };
 
-  const handleBillImport = async (file: File, provider: "alipay" | "wechat") => {
+  const handleBillImport = async (
+    file: File,
+    provider: "alipay" | "wechat"
+  ) => {
     const lowerName = file.name.toLowerCase();
-    const allowedExtensions = provider === "wechat" ? [".csv", ".xlsx", ".xls"] : [".csv"];
+    const allowedExtensions =
+      provider === "wechat" ? [".csv", ".xlsx", ".xls"] : [".csv"];
 
     if (!allowedExtensions.some((ext) => lowerName.endsWith(ext))) {
       alert(
@@ -201,7 +226,9 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
     setIsImporting(true);
     setImportResult(null);
     setImportMetadata(null);
-    setCurrentImportLabel(provider === "alipay" ? "支付宝账单" : "微信支付账单");
+    setCurrentImportLabel(
+      provider === "alipay" ? "支付宝账单" : "微信支付账单"
+    );
 
     try {
       const formData = new FormData();
@@ -222,7 +249,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
         let errorMessage = "账单导入失败，请检查文件内容";
         try {
           const errorPayload = await response.json();
-          errorMessage = errorPayload?.detail || errorPayload?.message || errorMessage;
+          errorMessage =
+            errorPayload?.detail || errorPayload?.message || errorMessage;
         } catch (parseError) {
           console.warn("解析账单导入错误响应失败", parseError);
         }
@@ -245,7 +273,10 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       link.href = url;
 
       const contentDisposition = response.headers.get("content-disposition");
-      let filename = provider === "alipay" ? "alipay_normalized.csv" : "wechat_normalized.csv";
+      let filename =
+        provider === "alipay"
+          ? "alipay_normalized.csv"
+          : "wechat_normalized.csv";
       if (contentDisposition) {
         const match = contentDisposition.match(/filename=([^;]+)/i);
         if (match && match[1]) {
@@ -260,8 +291,14 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
       setImportMetadata(parsedMetadata);
 
-      const normalizedRows = typeof parsedMetadata?.normalized_rows === "number" ? parsedMetadata.normalized_rows : 0;
-      const droppedRows = typeof parsedMetadata?.dropped_rows === "number" ? parsedMetadata.dropped_rows : 0;
+      const normalizedRows =
+        typeof parsedMetadata?.normalized_rows === "number"
+          ? parsedMetadata.normalized_rows
+          : 0;
+      const droppedRows =
+        typeof parsedMetadata?.dropped_rows === "number"
+          ? parsedMetadata.dropped_rows
+          : 0;
 
       setImportResult({
         success: true,
@@ -275,7 +312,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
       });
     } catch (error) {
       console.error("账单导入失败:", error);
-      const message = error instanceof Error ? error.message : "账单导入失败，请重试";
+      const message =
+        error instanceof Error ? error.message : "账单导入失败，请重试";
       setImportResult({
         success: false,
         message,
@@ -283,7 +321,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
         skipped_count: 0,
         duplicate_count: 0,
         error_details: [],
-        duplicate_details: []
+        duplicate_details: [],
       });
       setImportMetadata(null);
     } finally {
@@ -295,7 +333,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setDragActive(false);
-    
+
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       handleFileUpload(files[0]);
@@ -333,7 +371,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+      <div className="bg-white rounded-lg shadow-lg w-full max-w-4xl max-h-[90vh] overflow-y-auto">
         {/* 头部 */}
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-semibold">交易数据导入导出</h2>
@@ -379,11 +417,99 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                 <h3 className="font-medium text-blue-900 mb-2">导入说明</h3>
                 <ul className="text-sm text-blue-800 space-y-1">
-                  <li>• 支持自建交易CSV模板导入，数据将直接写入系统并触发去重。</li>
-                  <li>• 支付宝/微信账单会先转换为标准化CSV供下载，请确认无误后再通过交易CSV导入。</li>
-                  <li>• 系统会根据时间、金额、交易对方、商品名称进行去重判断。</li>
-                  <li>• 建议先下载模板查看格式要求。</li>
+                  <li>
+                    • 支持自建交易CSV模板导入，建议先下载模板查看格式要求。
+                  </li>
+                  <li>
+                    • 支付宝/微信账单会先转换为标准化CSV供下载，请确认无误后再进行导入。
+                  </li>
+                  <li>
+                    • 系统会根据时间、金额、交易对方、商品名称进行去重判断。
+                  </li>
                 </ul>
+              </div>
+
+              {/* 三个导入区域 */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                {/* 1. 支付宝账单导入 */}
+                <div className="border-2 border-orange-200 rounded-lg p-6 bg-orange-50 h-full flex flex-col">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CreditCard className="w-6 h-6 text-orange-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      支付宝账单格式转换
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    支持支付宝导出的CSV账单，系统会自动解析并转换为统一格式。
+                  </p>
+                  <input
+                    type="file"
+                    accept=".csv"
+                    onChange={(event) => handleBillFileSelect(event, "alipay")}
+                    className="hidden"
+                    id="alipay-bill-upload"
+                  />
+                  <div className="mt-auto">
+                    <label
+                      htmlFor="alipay-bill-upload"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 cursor-pointer transition-colors"
+                    >
+                      <Upload className="w-4 h-4" />
+                      选择支付宝账单文件
+                    </label>
+                  </div>
+                </div>
+
+                {/* 2. 微信支付账单导入 */}
+                <div className="border-2 border-green-200 rounded-lg p-6 bg-green-50 h-full flex flex-col">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Smartphone className="w-6 h-6 text-green-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      微信支付账单格式转换
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    支持微信支付导出的CSV或Excel账单（XLSX/XLS），并转换为统一格式。
+                  </p>
+                  <input
+                    type="file"
+                    accept=".csv,.xlsx,.xls"
+                    onChange={(event) => handleBillFileSelect(event, "wechat")}
+                    className="hidden"
+                    id="wechat-bill-upload"
+                  />
+                  <div className="mt-auto">
+                    <label
+                      htmlFor="wechat-bill-upload"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 cursor-pointer transition-colors"
+                    >
+                      <Upload className="w-4 h-4" />
+                      选择微信账单文件
+                    </label>
+                  </div>
+                </div>
+
+                {/* 3. 自建交易导入 */}
+                <div className="border-2 border-blue-200 rounded-lg p-6 bg-blue-50 h-full flex flex-col">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FileText className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">
+                      自建交易模板下载
+                    </h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    对于非结构性数据，建议下载模板后根据列名称手动填入数据。
+                  </p>
+                  <div className="mt-auto">
+                    <button
+                      onClick={handleDownloadTemplate}
+                      className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      下载CSV模板
+                    </button>
+                  </div>
+                </div>
               </div>
 
               {/* 导入选项 */}
@@ -399,106 +525,34 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 </label>
               </div>
 
-              {/* 三个导入区域 */}
-              <div className="grid grid-cols-1 gap-6">
-                {/* 1. 支付宝账单导入 */}
-                <div className="border-2 border-orange-200 rounded-lg p-6 bg-orange-50">
-                  <div className="flex items-center gap-2 mb-4">
-                    <CreditCard className="w-6 h-6 text-orange-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">支付宝账单导入</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    支持支付宝导出的CSV账单，系统会自动解析并转换为统一格式。
-                  </p>
-                  <input
-                    type="file"
-                    accept=".csv"
-                    onChange={(event) => handleBillFileSelect(event, "alipay")}
-                    className="hidden"
-                    id="alipay-bill-upload"
-                  />
-                  <label
-                    htmlFor="alipay-bill-upload"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 cursor-pointer transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    选择支付宝账单文件
-                  </label>
-                </div>
-
-                {/* 2. 微信支付账单导入 */}
-                <div className="border-2 border-green-200 rounded-lg p-6 bg-green-50">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Smartphone className="w-6 h-6 text-green-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">微信支付账单导入</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    支持微信支付导出的CSV或Excel账单（XLSX/XLS），自动识别多种时间字段。
-                  </p>
-                  <input
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    onChange={(event) => handleBillFileSelect(event, "wechat")}
-                    className="hidden"
-                    id="wechat-bill-upload"
-                  />
-                  <label
-                    htmlFor="wechat-bill-upload"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 cursor-pointer transition-colors"
-                  >
-                    <Upload className="w-4 h-4" />
-                    选择微信账单文件
-                  </label>
-                </div>
-
-                {/* 3. 自建交易导入 */}
-                <div className="border-2 border-blue-200 rounded-lg p-6 bg-blue-50">
-                  <div className="flex items-center gap-2 mb-4">
-                    <FileText className="w-6 h-6 text-blue-600" />
-                    <h3 className="text-lg font-semibold text-gray-800">自建交易导入</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-4">
-                    导入标准格式的CSV交易文件，数据将直接写入系统。支持拖拽上传或点击选择文件。
-                  </p>
-                  <div className="mb-4">
-                    <button
-                      onClick={handleDownloadTemplate}
-                      className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
-                    >
-                      <Download className="w-4 h-4" />
-                      下载CSV模板
-                    </button>
-                  </div>
-                  <div
-                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
-                      dragActive
-                        ? "border-blue-500 bg-blue-100"
-                        : "border-blue-300 bg-white hover:border-blue-400"
-                    }`}
-                    onDrop={handleDrop}
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                  >
-                    <Upload className="w-10 h-10 text-blue-400 mx-auto mb-3" />
-                    <p className="text-gray-600 mb-3">
-                      拖拽CSV文件到此处，或点击选择文件
-                    </p>
-                    <input
-                      type="file"
-                      accept=".csv"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                      id="csv-upload"
-                    />
-                    <label
-                      htmlFor="csv-upload"
-                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer transition-colors"
-                    >
-                      <Upload className="w-4 h-4" />
-                      选择CSV文件
-                    </label>
-                  </div>
-                </div>
+              <div
+                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                  dragActive
+                    ? "border-blue-500 bg-blue-100"
+                    : "border-blue-300 bg-white hover:border-blue-400"
+                }`}
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+              >
+                <Upload className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+                <p className="text-gray-600 mb-3">
+                  拖拽CSV文件到此处，或点击选择文件
+                </p>
+                <input
+                  type="file"
+                  accept=".csv"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                  id="csv-upload"
+                />
+                <label
+                  htmlFor="csv-upload"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer transition-colors"
+                >
+                  <Upload className="w-4 h-4" />
+                  选择CSV文件
+                </label>
               </div>
 
               {/* 导入状态 */}
@@ -536,118 +590,176 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                     <>
                       {importResult.parser_details ? (
                         <div className="text-sm text-green-700 space-y-1 mb-4">
-                          <p>✅ 转换完成: {importResult.imported_count} 条标准记录</p>
+                          <p>
+                            ✅ 转换完成: {importResult.imported_count}{" "}
+                            条标准记录
+                          </p>
                           {importResult.skipped_count > 0 && (
-                            <p>❌ 清洗后丢弃: {importResult.skipped_count} 条记录</p>
+                            <p>
+                              ❌ 清洗后丢弃: {importResult.skipped_count} 条记录
+                            </p>
                           )}
-                          <p className="text-xs text-gray-600">已自动下载标准化CSV，可用于后续交易导入。</p>
+                          <p className="text-xs text-gray-600">
+                            已自动下载标准化CSV，可用于后续交易导入。
+                          </p>
                         </div>
                       ) : (
                         <div className="text-sm text-green-700 space-y-1 mb-4">
-                          <p>✅ 成功导入: {importResult.imported_count} 条记录</p>
-                          <p>🔄 跳过重复: {importResult.duplicate_count} 条记录</p>
-                          <p>❌ 跳过错误: {importResult.skipped_count} 条记录</p>
+                          <p>
+                            ✅ 成功导入: {importResult.imported_count} 条记录
+                          </p>
+                          <p>
+                            🔄 跳过重复: {importResult.duplicate_count} 条记录
+                          </p>
+                          <p>
+                            ❌ 跳过错误: {importResult.skipped_count} 条记录
+                          </p>
                         </div>
                       )}
 
                       {importMetadata && (
                         <div className="text-xs text-gray-600 bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4">
-                          <div className="font-medium text-gray-700 mb-1">解析详情</div>
+                          <div className="font-medium text-gray-700 mb-1">
+                            解析详情
+                          </div>
                           <div className="grid grid-cols-2 gap-2">
-                            {importMetadata.format && <span>格式: {importMetadata.format}</span>}
-                            {importMetadata.encoding && <span>编码: {importMetadata.encoding}</span>}
+                            {importMetadata.format && (
+                              <span>格式: {importMetadata.format}</span>
+                            )}
+                            {importMetadata.encoding && (
+                              <span>编码: {importMetadata.encoding}</span>
+                            )}
                             {typeof importMetadata.raw_rows === "number" && (
                               <span>原始行数: {importMetadata.raw_rows}</span>
                             )}
-                            {typeof importMetadata.normalized_rows === "number" && (
-                              <span>有效行数: {importMetadata.normalized_rows}</span>
+                            {typeof importMetadata.normalized_rows ===
+                              "number" && (
+                              <span>
+                                有效行数: {importMetadata.normalized_rows}
+                              </span>
                             )}
-                            {typeof importMetadata.dropped_rows === "number" && (
-                              <span>清洗后丢弃: {importMetadata.dropped_rows}</span>
+                            {typeof importMetadata.dropped_rows ===
+                              "number" && (
+                              <span>
+                                清洗后丢弃: {importMetadata.dropped_rows}
+                              </span>
                             )}
                           </div>
                         </div>
                       )}
 
                       {/* 重复数据详情 */}
-                      {importResult.duplicate_details && importResult.duplicate_details.length > 0 && (
-                        <div className="mt-4">
-                          <button
-                            onClick={() => setShowDuplicateDetails(!showDuplicateDetails)}
-                            className="flex items-center gap-2 text-sm text-orange-700 hover:text-orange-800 font-medium"
-                          >
-                            {showDuplicateDetails ? (
-                              <ChevronUp className="w-4 h-4" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4" />
+                      {importResult.duplicate_details &&
+                        importResult.duplicate_details.length > 0 && (
+                          <div className="mt-4">
+                            <button
+                              onClick={() =>
+                                setShowDuplicateDetails(!showDuplicateDetails)
+                              }
+                              className="flex items-center gap-2 text-sm text-orange-700 hover:text-orange-800 font-medium"
+                            >
+                              {showDuplicateDetails ? (
+                                <ChevronUp className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                              查看重复数据详情 (
+                              {importResult.duplicate_details.length} 条)
+                            </button>
+
+                            {showDuplicateDetails && (
+                              <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
+                                {importResult.duplicate_details.map(
+                                  (detail, index) => (
+                                    <div
+                                      key={index}
+                                      className="bg-orange-50 border border-orange-200 rounded p-3 text-xs"
+                                    >
+                                      <div className="font-medium text-orange-800 mb-1">
+                                        第 {detail.row} 行
+                                      </div>
+                                      <div className="text-orange-700 space-y-1">
+                                        <p>时间: {detail.transaction_time}</p>
+                                        <p>金额: ¥{detail.amount}</p>
+                                        <p>
+                                          交易对方:{" "}
+                                          {detail.counterparty || "无"}
+                                        </p>
+                                        <p>
+                                          商品名称: {detail.item_name || "无"}
+                                        </p>
+                                        <p className="font-medium">
+                                          原因: {detail.reason}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  )
+                                )}
+                              </div>
                             )}
-                            查看重复数据详情 ({importResult.duplicate_details.length} 条)
-                          </button>
-                          
-                          {showDuplicateDetails && (
-                            <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
-                              {importResult.duplicate_details.map((detail, index) => (
-                                <div key={index} className="bg-orange-50 border border-orange-200 rounded p-3 text-xs">
-                                  <div className="font-medium text-orange-800 mb-1">
-                                    第 {detail.row} 行
-                                  </div>
-                                  <div className="text-orange-700 space-y-1">
-                                    <p>时间: {detail.transaction_time}</p>
-                                    <p>金额: ¥{detail.amount}</p>
-                                    <p>交易对方: {detail.counterparty || "无"}</p>
-                                    <p>商品名称: {detail.item_name || "无"}</p>
-                                    <p className="font-medium">原因: {detail.reason}</p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                          </div>
+                        )}
 
                       {/* 错误数据详情 */}
-                      {importResult.error_details && importResult.error_details.length > 0 && (
-                        <div className="mt-4">
-                          <button
-                            onClick={() => setShowErrorDetails(!showErrorDetails)}
-                            className="flex items-center gap-2 text-sm text-red-700 hover:text-red-800 font-medium"
-                          >
-                            {showErrorDetails ? (
-                              <ChevronUp className="w-4 h-4" />
-                            ) : (
-                              <ChevronDown className="w-4 h-4" />
+                      {importResult.error_details &&
+                        importResult.error_details.length > 0 && (
+                          <div className="mt-4">
+                            <button
+                              onClick={() =>
+                                setShowErrorDetails(!showErrorDetails)
+                              }
+                              className="flex items-center gap-2 text-sm text-red-700 hover:text-red-800 font-medium"
+                            >
+                              {showErrorDetails ? (
+                                <ChevronUp className="w-4 h-4" />
+                              ) : (
+                                <ChevronDown className="w-4 h-4" />
+                              )}
+                              查看错误数据详情 (
+                              {importResult.error_details.length} 条)
+                            </button>
+
+                            {showErrorDetails && (
+                              <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
+                                {importResult.error_details.map(
+                                  (detail, index) => (
+                                    <div
+                                      key={index}
+                                      className="bg-red-50 border border-red-200 rounded p-3 text-xs"
+                                    >
+                                      <div className="font-medium text-red-800 mb-1">
+                                        第 {detail.row} 行
+                                      </div>
+                                      <div className="text-red-700 space-y-1">
+                                        <div className="grid grid-cols-2 gap-2">
+                                          <div>
+                                            交易时间: {detail.data.交易时间}
+                                          </div>
+                                          <div>类型: {detail.data.类型}</div>
+                                          <div>金额: {detail.data.金额}</div>
+                                          <div>收支: {detail.data.收支}</div>
+                                          <div>
+                                            支付方式: {detail.data.支付方式}
+                                          </div>
+                                          <div>
+                                            交易对方: {detail.data.交易对方}
+                                          </div>
+                                        </div>
+                                        <div>
+                                          商品名称: {detail.data.商品名称}
+                                        </div>
+                                        <div>备注: {detail.data.备注}</div>
+                                        <div className="font-medium border-t border-red-200 pt-1 mt-2">
+                                          错误原因: {detail.reason}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  )
+                                )}
+                              </div>
                             )}
-                            查看错误数据详情 ({importResult.error_details.length} 条)
-                          </button>
-                          
-                          {showErrorDetails && (
-                            <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
-                              {importResult.error_details.map((detail, index) => (
-                                <div key={index} className="bg-red-50 border border-red-200 rounded p-3 text-xs">
-                                  <div className="font-medium text-red-800 mb-1">
-                                    第 {detail.row} 行
-                                  </div>
-                                  <div className="text-red-700 space-y-1">
-                                    <div className="grid grid-cols-2 gap-2">
-                                      <div>交易时间: {detail.data.交易时间}</div>
-                                      <div>类型: {detail.data.类型}</div>
-                                      <div>金额: {detail.data.金额}</div>
-                                      <div>收支: {detail.data.收支}</div>
-                                      <div>支付方式: {detail.data.支付方式}</div>
-                                      <div>交易对方: {detail.data.交易对方}</div>
-                                    </div>
-                                    <div>商品名称: {detail.data.商品名称}</div>
-                                    <div>备注: {detail.data.备注}</div>
-                                    <div className="font-medium border-t border-red-200 pt-1 mt-2">
-                                      错误原因: {detail.reason}
-                                    </div>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      )}
+                          </div>
+                        )}
                     </>
                   )}
                 </div>
