@@ -386,17 +386,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 </ul>
               </div>
 
-              {/* 下载模板 */}
-              <div>
-                <button
-                  onClick={handleDownloadTemplate}
-                  className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200"
-                >
-                  <FileText className="w-4 h-4" />
-                  下载CSV模板
-                </button>
-              </div>
-
               {/* 导入选项 */}
               <div>
                 <label className="flex items-center gap-2">
@@ -410,45 +399,16 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                 </label>
               </div>
 
-              {/* 文件上传区域 */}
-              <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center ${
-                  dragActive
-                    ? "border-blue-500 bg-blue-50"
-                    : "border-gray-300 hover:border-gray-400"
-                }`}
-                onDrop={handleDrop}
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-              >
-                <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-600 mb-2">
-                  拖拽CSV文件到此处，或点击选择文件
-                </p>
-                <input
-                  type="file"
-                  accept=".csv"
-                  onChange={handleFileSelect}
-                  className="hidden"
-                  id="csv-upload"
-                />
-                <label
-                  htmlFor="csv-upload"
-                  className="inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer"
-                >
-                  选择文件
-                </label>
-              </div>
-
-              {/* 第三方账单导入 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CreditCard className="w-5 h-5 text-orange-500" />
-                    <h3 className="font-medium text-gray-800">支付宝账单</h3>
+              {/* 三个导入区域 */}
+              <div className="grid grid-cols-1 gap-6">
+                {/* 1. 支付宝账单导入 */}
+                <div className="border-2 border-orange-200 rounded-lg p-6 bg-orange-50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <CreditCard className="w-6 h-6 text-orange-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">支付宝账单导入</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">
-                    支持支付宝导出的CSV账单，系统会自动解析并转换为统一格式。
+                  <p className="text-sm text-gray-600 mb-4">
+                    支持支付宝导出的CSV账单，系统会自动解析并转换为统一格式。转换后的文件将自动下载，您可以确认无误后再通过"自建交易导入"功能导入系统。
                   </p>
                   <input
                     type="file"
@@ -459,19 +419,21 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                   />
                   <label
                     htmlFor="alipay-bill-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-orange-500 text-white rounded-lg hover:bg-orange-600 cursor-pointer transition-colors"
                   >
-                    上传支付宝账单
+                    <Upload className="w-4 h-4" />
+                    选择支付宝账单文件
                   </label>
                 </div>
 
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Smartphone className="w-5 h-5 text-green-500" />
-                    <h3 className="font-medium text-gray-800">微信支付账单</h3>
+                {/* 2. 微信支付账单导入 */}
+                <div className="border-2 border-green-200 rounded-lg p-6 bg-green-50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <Smartphone className="w-6 h-6 text-green-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">微信支付账单导入</h3>
                   </div>
-                  <p className="text-sm text-gray-600 mb-3">
-                    支持微信支付导出的CSV或Excel账单（XLSX/XLS），自动识别多种时间字段。
+                  <p className="text-sm text-gray-600 mb-4">
+                    支持微信支付导出的CSV或Excel账单（XLSX/XLS），自动识别多种时间字段。转换后的文件将自动下载，您可以确认无误后再通过"自建交易导入"功能导入系统。
                   </p>
                   <input
                     type="file"
@@ -482,10 +444,60 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                   />
                   <label
                     htmlFor="wechat-bill-upload"
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 cursor-pointer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 cursor-pointer transition-colors"
                   >
-                    上传微信账单
+                    <Upload className="w-4 h-4" />
+                    选择微信账单文件
                   </label>
+                </div>
+
+                {/* 3. 自建交易导入 */}
+                <div className="border-2 border-blue-200 rounded-lg p-6 bg-blue-50">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FileText className="w-6 h-6 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-gray-800">自建交易导入</h3>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-4">
+                    导入标准格式的CSV交易文件，数据将直接写入系统。支持拖拽上传或点击选择文件。
+                  </p>
+                  <div className="mb-4">
+                    <button
+                      onClick={handleDownloadTemplate}
+                      className="flex items-center gap-2 px-4 py-2 bg-white border border-blue-300 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors"
+                    >
+                      <Download className="w-4 h-4" />
+                      下载CSV模板
+                    </button>
+                  </div>
+                  <div
+                    className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                      dragActive
+                        ? "border-blue-500 bg-blue-100"
+                        : "border-blue-300 bg-white hover:border-blue-400"
+                    }`}
+                    onDrop={handleDrop}
+                    onDragOver={handleDragOver}
+                    onDragLeave={handleDragLeave}
+                  >
+                    <Upload className="w-10 h-10 text-blue-400 mx-auto mb-3" />
+                    <p className="text-gray-600 mb-3">
+                      拖拽CSV文件到此处，或点击选择文件
+                    </p>
+                    <input
+                      type="file"
+                      accept=".csv"
+                      onChange={handleFileSelect}
+                      className="hidden"
+                      id="csv-upload"
+                    />
+                    <label
+                      htmlFor="csv-upload"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 cursor-pointer transition-colors"
+                    >
+                      <Upload className="w-4 h-4" />
+                      选择CSV文件
+                    </label>
+                  </div>
                 </div>
               </div>
 
