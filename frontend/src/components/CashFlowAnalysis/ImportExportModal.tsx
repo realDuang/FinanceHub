@@ -408,7 +408,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                     <h3 className="text-lg font-semibold text-gray-800">支付宝账单导入</h3>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">
-                    支持支付宝导出的CSV账单，系统会自动解析并转换为统一格式。转换后的文件将自动下载，您可以确认无误后再通过"自建交易导入"功能导入系统。
+                    支持支付宝导出的CSV账单，系统会自动解析并转换为统一格式。
                   </p>
                   <input
                     type="file"
@@ -433,7 +433,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                     <h3 className="text-lg font-semibold text-gray-800">微信支付账单导入</h3>
                   </div>
                   <p className="text-sm text-gray-600 mb-4">
-                    支持微信支付导出的CSV或Excel账单（XLSX/XLS），自动识别多种时间字段。转换后的文件将自动下载，您可以确认无误后再通过"自建交易导入"功能导入系统。
+                    支持微信支付导出的CSV或Excel账单（XLSX/XLS），自动识别多种时间字段。
                   </p>
                   <input
                     type="file"
