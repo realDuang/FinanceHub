@@ -84,3 +84,42 @@ export interface FinancialQuery {
   start_date?: string;
   end_date?: string;
 }
+
+export interface TransactionImportPayload {
+  records: Array<{
+    transaction_time: string;
+    category: string;
+    amount: string;
+    income_expense_type: string;
+    payment_method?: string;
+    counterparty?: string;
+    item_name?: string;
+    remarks?: string;
+  }>;
+  enable_deduplication: boolean;
+}
+
+export interface ImportErrorDetail {
+  row: number;
+  reason: string;
+  data?: Record<string, string>;
+}
+
+export interface ImportDuplicateDetail {
+  row: number;
+  transaction_time: string;
+  amount: number;
+  counterparty: string;
+  item_name: string;
+  reason: string;
+}
+
+export interface TransactionImportResult {
+  success: boolean;
+  message: string;
+  imported_count: number;
+  skipped_count: number;
+  duplicate_count: number;
+  error_details: ImportErrorDetail[];
+  duplicate_details: ImportDuplicateDetail[];
+}

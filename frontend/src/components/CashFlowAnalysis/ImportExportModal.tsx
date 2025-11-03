@@ -11,12 +11,17 @@ import {
   CreditCard,
   Smartphone,
 } from "lucide-react";
+import Papa from "papaparse";
+import { useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../services/constants";
+import {
+  TransactionDraftRow,
+  useImportReview,
+} from "../../context/ImportReviewContext";
 
 interface ImportExportModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onImportSuccess?: () => void;
   defaultTab?: "import" | "export";
 }
 
@@ -49,16 +54,38 @@ interface ImportResult {
   };
 }
 
+const REQUIRED_COLUMNS = [
+  "交易时间",
+  "类型",
+  "金额",
+  "收支",
+  "支付方式",
+  "交易对方",
+  "商品名称",
+  "备注",
+];
+
+const CSV_TO_DRAFT_KEY_MAP: Record<string, keyof TransactionDraftRow> = {
+  交易时间: "transaction_time",
+  类型: "category",
+  金额: "amount",
+  收支: "income_expense_type",
+  支付方式: "payment_method",
+  交易对方: "counterparty",
+  商品名称: "item_name",
+  备注: "remarks",
+};
+
 const ImportExportModal: React.FC<ImportExportModalProps> = ({
   isOpen,
   onClose,
-  onImportSuccess,
   defaultTab = "import",
 }) => {
+  const navigate = useNavigate();
+  const { setRows: setDraftRows, setSourceFileName } = useImportReview();
   const [activeTab, setActiveTab] = useState<"import" | "export">(defaultTab);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [enableDeduplication, setEnableDeduplication] = useState(true);
   const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [isImporting, setIsImporting] = useState(false);
   const [dragActive, setDragActive] = useState(false);
@@ -70,6 +97,78 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
   const [currentImportLabel, setCurrentImportLabel] = useState<string | null>(
     null
   );
+
+  const parseCsvFile = (file: File): Promise<TransactionDraftRow[]> =>
+    new Promise((resolve, reject) => {
+      Papa.parse<Record<string, unknown>>(file, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (results) => {
+          const parseErrors = results.errors || [];
+          if (parseErrors.length > 0) {
+            reject(new Error(`CSV解析失败: ${parseErrors[0].message}`));
+            return;
+          }
+
+          const fields = results.meta.fields || [];
+          const missingColumns = REQUIRED_COLUMNS.filter(
+            (column) => !fields.includes(column)
+          );
+
+          if (missingColumns.length > 0) {
+            reject(
+              new Error(
+                `CSV缺少以下列: ${missingColumns
+                  .map((name) => `"${name}"`)
+                  .join("、")}`
+              )
+            );
+            return;
+          }
+
+          const parsedRows = (results.data || [])
+            .map((row: Record<string, unknown>) => {
+              const draftRow: TransactionDraftRow = {
+                transaction_time: "",
+                category: "",
+                amount: "",
+                income_expense_type: "",
+                payment_method: "",
+                counterparty: "",
+                item_name: "",
+                remarks: "",
+                __isNew: false,
+                __editableCells: {},
+              };
+
+              REQUIRED_COLUMNS.forEach((column) => {
+                const key = CSV_TO_DRAFT_KEY_MAP[column];
+                const rawValue = row[column];
+                if (typeof rawValue === "string") {
+                  draftRow[key] = rawValue.trim();
+                } else if (rawValue === null || rawValue === undefined) {
+                  draftRow[key] = "";
+                } else {
+                  draftRow[key] = String(rawValue).trim();
+                }
+              });
+
+              return draftRow;
+            })
+            .filter((draftRow) =>
+              Object.values(draftRow).some((value) => value.trim() !== "")
+            );
+
+          if (parsedRows.length === 0) {
+            reject(new Error("CSV未包含任何有效数据行"));
+            return;
+          }
+
+          resolve(parsedRows);
+        },
+        error: (error) => reject(new Error(error.message)),
+      });
+    });
 
   // 当模态框打开时，重置为默认选项卡
   React.useEffect(() => {
@@ -160,32 +259,17 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
     setCurrentImportLabel("交易明细 CSV");
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
-      formData.append("enable_deduplication", enableDeduplication.toString());
-
-      const response = await fetch(`${API_BASE_URL}/transactions/import`, {
-        method: "POST",
-        body: formData,
-      });
-
-      const resultPayload = await response.json();
-
-      if (!response.ok) {
-        const errorMessage =
-          resultPayload?.detail ||
-          resultPayload?.message ||
-          "导入失败，请检查文件内容";
-        throw new Error(errorMessage);
-      }
-
-      const result: ImportResult = resultPayload;
-      setImportResult(result);
-      setImportMetadata(result.parser_details ?? null);
-
-      if (result.success && onImportSuccess) {
-        onImportSuccess();
-      }
+      const parsedRows = await parseCsvFile(file);
+      setDraftRows(
+        parsedRows.map((row) => ({
+          ...row,
+          __isNew: false,
+          __editableCells: row.__editableCells ?? {},
+        }))
+      );
+      setSourceFileName(file.name);
+      onClose();
+      navigate("/transaction-import/review");
     } catch (error) {
       console.error("导入失败:", error);
       const message =
@@ -233,7 +317,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("enable_deduplication", enableDeduplication.toString());
+      formData.append("enable_deduplication", "true");
 
       const endpoint =
         provider === "alipay"
@@ -421,7 +505,8 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
                     • 支持自建交易CSV模板导入，建议先下载模板查看格式要求。
                   </li>
                   <li>
-                    • 支付宝/微信账单会先转换为标准化CSV供下载，请确认无误后再进行导入。
+                    •
+                    支付宝/微信账单会先转换为标准化CSV供下载，请确认无误后再进行导入。
                   </li>
                   <li>
                     • 系统会根据时间、金额、交易对方、商品名称进行去重判断。
@@ -513,18 +598,6 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
               </div>
 
               {/* 导入选项 */}
-              <div>
-                <label className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    checked={enableDeduplication}
-                    onChange={(e) => setEnableDeduplication(e.target.checked)}
-                    className="rounded"
-                  />
-                  <span className="text-sm text-gray-700">启用去重检查</span>
-                </label>
-              </div>
-
               <div
                 className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                   dragActive
@@ -559,7 +632,7 @@ const ImportExportModal: React.FC<ImportExportModalProps> = ({
               {isImporting && (
                 <div className="flex items-center gap-2 text-blue-600">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
-                  <span>正在导入{currentImportLabel ?? "数据"}...</span>
+                  <span>正在处理{currentImportLabel ?? "数据"}...</span>
                 </div>
               )}
 

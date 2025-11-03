@@ -4,6 +4,8 @@ import type {
   FinancialAggregationRecord,
   FinancialQuery,
   RequestOptions,
+  TransactionImportPayload,
+  TransactionImportResult,
   TransactionFilterQuery,
   TransactionFilterResult,
 } from "./types";
@@ -87,6 +89,17 @@ class RequestAPI {
     });
   }
 
+  async postWithoutJsonHeader<T = any>(
+    endpoint: string,
+    body: FormData
+  ): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: "POST",
+      body,
+      headers: {},
+    });
+  }
+
   /**
    * 文件上传
    */
@@ -94,11 +107,7 @@ class RequestAPI {
     const formData = new FormData();
     formData.append("file", file);
 
-    return this.request<T>(endpoint, {
-      method: "POST",
-      body: formData,
-      headers: {}, // 让浏览器自动设置Content-Type
-    });
+    return this.postWithoutJsonHeader<T>(endpoint, formData);
   }
 }
 
@@ -159,6 +168,15 @@ class FinancialAPI extends RequestAPI {
   async healthCheck(): Promise<{ status: string; message: string }> {
     return this.get<{ status: string; message: string }>("/health");
   }
+
+  async importTransactionsFromRecords(
+    payload: TransactionImportPayload
+  ): Promise<TransactionImportResult> {
+    return this.post<TransactionImportResult>(
+      "/transactions/import/records",
+      payload
+    );
+  }
 }
 
 // 创建API实例
@@ -172,6 +190,7 @@ export const {
   getFinancialAggregationRecords,
   // 健康检查
   healthCheck,
+  importTransactionsFromRecords,
 } = api;
 
 export default api;

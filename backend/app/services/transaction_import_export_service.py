@@ -183,6 +183,74 @@ class TransactionImportExportService:
         )
 
     @staticmethod
+    def import_from_json_records(
+        db: Session,
+        records: List[Dict[str, Any]],
+        enable_deduplication: bool = True
+    ) -> Dict[str, Any]:
+        """从JSON记录列表导入交易明细数据。"""
+
+        if not records:
+            return {
+                "success": False,
+                "message": "没有可导入的数据",
+                "imported_count": 0,
+                "skipped_count": 0,
+                "duplicate_count": 0,
+                "error_details": [],
+                "duplicate_details": [],
+            }
+
+        transformed_rows: List[Dict[str, Any]] = []
+        for record in records:
+            transformed_rows.append(
+                {
+                    "交易时间": str(record.get("transaction_time", "")),
+                    "类型": str(record.get("category", "")),
+                    "金额": str(record.get("amount", "")),
+                    "收支": str(record.get("income_expense_type", "")),
+                    "支付方式": str(record.get("payment_method", "")),
+                    "交易对方": str(record.get("counterparty", "")),
+                    "商品名称": str(record.get("item_name", "")),
+                    "备注": str(record.get("remarks", "")),
+                }
+            )
+
+        has_effective_row = any(
+            any(str(value).strip() for value in row.values()) for row in transformed_rows
+        )
+
+        if not has_effective_row:
+            return {
+                "success": False,
+                "message": "提交的数据为空",
+                "imported_count": 0,
+                "skipped_count": 0,
+                "duplicate_count": 0,
+                "error_details": [],
+                "duplicate_details": [],
+            }
+
+        try:
+            df = pd.DataFrame(transformed_rows, columns=TransactionImportExportService.CSV_COLUMNS)
+        except Exception as error:
+            return {
+                "success": False,
+                "message": f"组装数据失败: {str(error)}",
+                "imported_count": 0,
+                "skipped_count": 0,
+                "duplicate_count": 0,
+                "error_details": [],
+                "duplicate_details": [],
+            }
+
+        return TransactionImportExportService._import_dataframe(
+            db=db,
+            df=df,
+            enable_deduplication=enable_deduplication
+        )
+
+    @staticmethod
     def _import_dataframe(
         db: Session,
         df: pd.DataFrame,

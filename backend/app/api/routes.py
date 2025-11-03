@@ -288,6 +288,29 @@ def import_transactions_csv(
         raise HTTPException(status_code=500, detail=f"导入交易明细失败: {str(e)}")
 
 
+@router.post("/transactions/import/records")
+def import_transactions_records(
+    payload: schemas.TransactionImportPayload,
+    db: Session = Depends(get_db),
+):
+    """提交编辑后的交易记录列表进行导入"""
+
+    records = [
+        record.model_dump() if hasattr(record, "model_dump") else record.dict()
+        for record in payload.records
+    ]
+
+    try:
+        result = TransactionImportExportService.import_from_json_records(
+            db=db,
+            records=records,
+            enable_deduplication=payload.enable_deduplication
+        )
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"导入交易明细失败: {str(e)}")
+
+
 @router.post("/transactions/import/alipay-bill")
 def import_alipay_bill(
     file: UploadFile = File(...),

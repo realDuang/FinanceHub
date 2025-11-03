@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import {
   BarChart3,
   PieChart,
@@ -9,6 +9,7 @@ import {
   Upload,
   Download,
 } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 import Overview from "../components/CashFlowAnalysis/Overview";
 import MonthlyExpenseChart from "../components/CashFlowAnalysis/MonthlyExpenseChart";
 import TrendChart from "../components/CashFlowAnalysis/TrendChart";
@@ -37,6 +38,8 @@ import {
  * 财务管理仪表板
  */
 const CashFlowAnalysis: React.FC = () => {
+  const location = useLocation();
+  const routerNavigate = useNavigate();
   const [timeRange, setTimeRange] = useState<TimeRange>("all");
   const [activeTab, setActiveTab] = useState<"overview" | "transactions">(
     "overview"
@@ -85,11 +88,24 @@ const CashFlowAnalysis: React.FC = () => {
     setTimeRange(newTimeRange);
   };
 
-  const handleImportSuccess = () => {
-    // 导入成功后刷新数据
-    refetchTransactions();
-    refetchFinancialData();
-  };
+  useEffect(() => {
+    const state = (location.state as { importSuccess?: boolean } | null) || null;
+    if (state?.importSuccess) {
+      refetchTransactions();
+      refetchFinancialData();
+      routerNavigate(`${location.pathname}${location.search}`, {
+        replace: true,
+        state: undefined,
+      });
+    }
+  }, [
+    location.pathname,
+    location.search,
+    location.state,
+    refetchFinancialData,
+    refetchTransactions,
+    routerNavigate,
+  ]);
 
   // 判断是否有数据
   const hasFinancialData = financialData && financialData.length > 0;
@@ -396,7 +412,6 @@ const CashFlowAnalysis: React.FC = () => {
       <ImportExportModal
         isOpen={isImportExportModalOpen}
         onClose={() => setIsImportExportModalOpen(false)}
-        onImportSuccess={handleImportSuccess}
         defaultTab={importExportModalDefaultTab}
       />
     </div>

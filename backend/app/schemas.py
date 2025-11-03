@@ -99,6 +99,26 @@ class TransactionFilterResult(BaseModel):
     pagination: PaginationInfo
 
 
+class TransactionImportRecord(BaseModel):
+    """交易导入草稿记录"""
+
+    transaction_time: str
+    category: str
+    amount: str
+    income_expense_type: str
+    payment_method: Optional[str] = None
+    counterparty: Optional[str] = None
+    item_name: Optional[str] = None
+    remarks: Optional[str] = None
+
+
+class TransactionImportPayload(BaseModel):
+    """交易导入提交载荷"""
+
+    records: List[TransactionImportRecord]
+    enable_deduplication: bool = True
+
+
 # 财务聚合记录相关模型
 class FinancialAggregationBase(BaseModel):
     """财务聚合记录基础模型"""
