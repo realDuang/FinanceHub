@@ -222,6 +222,27 @@
     "expenseByCategory": "Expense by Category",
     "topExpenseCategories": "Top Expense Categories"
   },
+  "categories": {
+    "housing": "Housing",
+    "dining": "Dining",
+    "living": "Living",
+    "entertainment": "Entertainment",
+    "transportation": "Transportation",
+    "travel": "Travel",
+    "gifts": "Gifts",
+    "transactions": "Transactions"
+  },
+  "dateFormat": {
+    "allData": "All Data",
+    "yearEnd": " End",
+    "monthEnd": " End",
+    "fullYear": " Full Year",
+    "to": " - "
+  },
+  "currency": {
+    "symbol": "$",
+    "locale": "en-US"
+  },
   "error": {
     "loadingFailed": "Loading Failed",
     "saveFailed": "Save Failed",

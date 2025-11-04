@@ -1,55 +1,75 @@
 export const expenseCategories = [
-  { key: "housing", label: "住房", color: "#ef4444" },
-  { key: "dining", label: "餐饮", color: "#f97316" },
-  { key: "living", label: "生活", color: "#eab308" },
-  { key: "entertainment", label: "娱乐", color: "#22c55e" },
-  { key: "transportation", label: "交通", color: "#3b82f6" },
-  { key: "travel", label: "旅行", color: "#8b5cf6" },
-  { key: "gifts", label: "礼物", color: "#ec4899" },
-  { key: "transactions", label: "交易", color: "#f59e0b" },
+  { key: "housing", color: "#ef4444" },
+  { key: "dining", color: "#f97316" },
+  { key: "living", color: "#eab308" },
+  { key: "entertainment", color: "#22c55e" },
+  { key: "transportation", color: "#3b82f6" },
+  { key: "travel", color: "#8b5cf6" },
+  { key: "gifts", color: "#ec4899" },
+  { key: "transactions", color: "#f59e0b" },
 ];
 
 /**
- * 格式化货币金额
- * @param amount 金额
- * @param currency 货币符号，默认为￥
- * @returns 格式化后的货币字符串
+ * Get translated expense category label
+ * @param key Category key
+ * @param t Translation function from useTranslation hook
+ * @returns Translated category label
  */
-export function formatCurrency(amount: number, currency: string = "￥"): string {
-  // 修复浮点数精度问题，保留2位小数
-  const fixedAmount = Math.round(amount * 100) / 100;
-  
-  return `${currency}${fixedAmount.toLocaleString('zh-CN', { 
-    minimumFractionDigits: 2, 
-    maximumFractionDigits: 2 
-  })}`;
+export function getCategoryLabel(key: string, t: (key: string) => string): string {
+  return t(`categories.${key}`);
 }
 
 /**
- * 格式化日期
- * @param dateString 日期字符串
- * @param format 格式化模式，支持 YYYY-MM、YYYY年MM月 等
- * @returns 格式化后的日期字符串
+ * Format currency amount with locale support
+ * @param amount Amount to format
+ * @param currency Currency symbol (optional, will use locale default if not provided)
+ * @param locale Locale string for number formatting (optional, will use 'zh-CN' if not provided)
+ * @returns Formatted currency string
  */
-export function formatDate(dateString: string, format: string = "YYYY-MM"): string {
+export function formatCurrency(amount: number, currency?: string, locale: string = 'zh-CN'): string {
+  // Fix floating point precision issues, keep 2 decimal places
+  const fixedAmount = Math.round(amount * 100) / 100;
+  
+  const formattedNumber = fixedAmount.toLocaleString(locale, { 
+    minimumFractionDigits: 2, 
+    maximumFractionDigits: 2 
+  });
+  
+  // Use provided currency or default based on locale
+  const currencySymbol = currency || (locale === 'zh-CN' ? '￥' : '$');
+  
+  return `${currencySymbol}${formattedNumber}`;
+}
+
+/**
+ * Format date with locale support
+ * @param dateString Date string to format
+ * @param format Format pattern, supports YYYY-MM or localized format
+ * @param useLocalizedFormat Whether to use localized format (e.g., "年月" for Chinese)
+ * @returns Formatted date string
+ */
+export function formatDate(dateString: string, format: string = "YYYY-MM", useLocalizedFormat: boolean = false): string {
   const date = new Date(dateString);
   const year = date.getFullYear();
   const month = date.getMonth() + 1;
   
+  if (useLocalizedFormat) {
+    // Return format for i18n usage: caller should append year/month labels via i18n
+    return `${year}-${String(month).padStart(2, '0')}`;
+  }
+  
   switch (format) {
     case "YYYY-MM":
       return `${year}-${String(month).padStart(2, '0')}`;
-    case "YYYY年MM月":
-      return `${year}年${month}月`;
     default:
       return `${year}-${String(month).padStart(2, '0')}`;
   }
 }
 
 /**
- * 格式化整数
- * @param num 数字
- * @returns 格式化后的整数字符串
+ * Format integer
+ * @param num Number to format
+ * @returns Formatted integer string
  */
 export function formatInteger(num: number): string {
   return Math.round(num).toString();

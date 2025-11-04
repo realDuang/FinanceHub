@@ -60,10 +60,14 @@ const CashFlowAnalysis: React.FC = () => {
   );
 
   // Calculate latest data end date
-  const latestDataDate = useMemo(
+  const latestDataDateObj = useMemo(
     () => getLatestDataDate(allData || undefined),
     [allData]
   );
+
+  const latestDataDate = latestDataDateObj
+    ? `${latestDataDateObj.year}${t('common.year')}${latestDataDateObj.month}${t('common.month')}${t('dateFormat.monthEnd')}`
+    : null;
 
   const availableYears = getAvailableYears(allData || undefined);
   const availableMonthRange = getAvailableMonthRange(allData || undefined);
@@ -135,11 +139,11 @@ const CashFlowAnalysis: React.FC = () => {
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
             <div className="mb-4 lg:mb-0">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                现金流分析
+                {t('cashFlow.title')}
               </h1>
               <p className="text-gray-600 flex items-center space-x-2">
                 <BarChart3 className="w-4 h-4" />
-                <span>数据范围: {formatDateRangeText(timeRange)}</span>
+                <span>{t('common.dataRange')}: {formatDateRangeText(timeRange, t)}</span>
               </p>
             </div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-3 sm:space-y-0 sm:space-x-4">

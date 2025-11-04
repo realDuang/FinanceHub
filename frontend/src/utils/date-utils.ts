@@ -73,61 +73,65 @@ export function getDateRangeFromTimeRange(timeRange: TimeRange): DateRange {
 }
 
 /**
- * 获取数据中最新的日期
+ * Get the latest date from data
+ * Returns object with year and month for i18n formatting
  */
 export function getLatestDataDate(
   data?: FinancialAggregationRecord[]
-): string | null {
+): { year: number; month: number } | null {
   if (!data || data.length === 0) {
     return null;
   }
 
-  // 对数据按日期排序（降序）
+  // Sort data by date (descending)
   const sortedData = [...data].sort((a, b) => {
-    // 解析日期字符串，确保正确的日期比较
+    // Parse date strings to ensure correct date comparison
     const dateA = parseDate(a.month_date);
     const dateB = parseDate(b.month_date);
     return dateB.getTime() - dateA.getTime();
   });
 
-  // 获取最新的月份日期
+  // Get the latest month date
   const latestDate = parseDate(sortedData[0].month_date);
 
-  // 格式化为 YYYY年MM月底
   const year = latestDate.getFullYear();
   const month = latestDate.getMonth() + 1;
 
-  return `${year}年${month}月底`;
+  return { year, month };
 }
 
 /**
- * 格式化日期范围显示文本
+ * Format date range display text with i18n support
+ * Returns object for i18n formatting or direct string
  */
-export function formatDateRangeText(timeRange: TimeRange): string {
-  // 检查是否是自定义范围
+export function formatDateRangeText(
+  timeRange: TimeRange,
+  t: (key: string, options?: Record<string, unknown>) => string
+): string {
+  // Check if it's a custom range
   if (timeRange.startsWith("custom:")) {
     const parts = timeRange.split(":");
     if (parts.length === 3) {
-      const startMonth = parts[1]; // 格式: YYYY-MM
-      const endMonth = parts[2]; // 格式: YYYY-MM
+      const startMonth = parts[1]; // Format: YYYY-MM
+      const endMonth = parts[2]; // Format: YYYY-MM
 
       const [startYear, startMon] = startMonth.split("-").map(Number);
       const [endYear, endMon] = endMonth.split("-").map(Number);
 
-      return `${startYear}年${startMon}月 - ${endYear}年${endMon}月`;
+      return `${startYear}${t('common.year')}${startMon}${t('common.month')}${t('dateFormat.to')}${endYear}${t('common.year')}${endMon}${t('common.month')}`;
     }
   }
 
   switch (timeRange) {
     case "all":
-      return "全部数据";
+      return t("dateFormat.allData");
     default: {
-      // 检查是否是年份
+      // Check if it's a year
       const year = parseInt(timeRange);
       if (!isNaN(year) && year >= 1900 && year <= 3000) {
-        return `${year}年全年`;
+        return `${year}${t('common.year')}${t('dateFormat.fullYear')}`;
       }
-      return "全部数据";
+      return t("dateFormat.allData");
     }
   }
 }
