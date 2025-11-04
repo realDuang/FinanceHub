@@ -36,9 +36,27 @@ export function formatCurrency(amount: number, currency?: string, locale: string
   });
   
   // Use provided currency or default based on locale
-  const currencySymbol = currency || (locale === 'zh-CN' ? '￥' : '$');
+  const currencySymbol = currency || getCurrencySymbolForLocale(locale);
   
   return `${currencySymbol}${formattedNumber}`;
+}
+
+/**
+ * Get currency symbol for locale
+ * @param locale Locale string
+ * @returns Currency symbol
+ */
+function getCurrencySymbolForLocale(locale: string): string {
+  const localeMap: Record<string, string> = {
+    'zh-CN': '￥',
+    'zh-TW': 'NT$',
+    'en-US': '$',
+    'en-GB': '£',
+    'en': '$',
+    'ja-JP': '¥',
+    'ko-KR': '₩',
+  };
+  return localeMap[locale] || '$';
 }
 
 /**

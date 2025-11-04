@@ -118,7 +118,9 @@ export function formatDateRangeText(
       const [startYear, startMon] = startMonth.split("-").map(Number);
       const [endYear, endMon] = endMonth.split("-").map(Number);
 
-      return `${startYear}${t('common.year')}${startMon}${t('common.month')}${t('dateFormat.to')}${endYear}${t('common.year')}${endMon}${t('common.month')}`;
+      const startText = `${startYear}${t('common.year')}${startMon}${t('common.month')}`;
+      const endText = `${endYear}${t('common.year')}${endMon}${t('common.month')}`;
+      return `${startText}${t('dateFormat.to')}${endText}`;
     }
   }
 
