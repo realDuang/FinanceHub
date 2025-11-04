@@ -44,6 +44,7 @@
     "clear": "清空",
     "year": "年",
     "month": "月",
+    "page": "第",
     "dataRange": "数据范围",
     "customRange": "自定义范围",
     "selectMonthRange": "选择月份范围",
@@ -118,7 +119,9 @@
     "exportSuccess": "导出成功",
     "importError": "导入失败",
     "exportError": "导出失败",
-    "financialOverview": "财务概览"
+    "financialOverview": "财务概览",
+    "salary": "工资",
+    "socialExpenses": "人情"
   },
   "transaction": {
     "title": "交易明细",

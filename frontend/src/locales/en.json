@@ -44,6 +44,7 @@
     "clear": "Clear",
     "year": "Year",
     "month": "Month",
+    "page": "Page",
     "dataRange": "Data Range",
     "customRange": "Custom Range",
     "selectMonthRange": "Select Month Range",
@@ -118,7 +119,9 @@
     "exportSuccess": "Export Successful",
     "importError": "Import Failed",
     "exportError": "Export Failed",
-    "financialOverview": "Financial Overview"
+    "financialOverview": "Financial Overview",
+    "salary": "Salary",
+    "socialExpenses": "Social"
   },
   "transaction": {
     "title": "Transaction Details",
