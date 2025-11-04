@@ -121,7 +121,9 @@
     "exportError": "Export Failed",
     "financialOverview": "Financial Overview",
     "salary": "Salary",
-    "socialExpenses": "Social"
+    "socialExpenses": "Social",
+    "noFinancialData": "No Financial Data",
+    "pleaseImportData": "Please import transaction data to generate financial analysis reports"
   },
   "transaction": {
     "title": "Transaction Details",

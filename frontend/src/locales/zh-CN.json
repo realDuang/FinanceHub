@@ -121,7 +121,9 @@
     "exportError": "导出失败",
     "financialOverview": "财务概览",
     "salary": "工资",
-    "socialExpenses": "人情"
+    "socialExpenses": "人情",
+    "noFinancialData": "暂无财务数据",
+    "pleaseImportData": "请先导入交易数据以生成财务分析报表"
   },
   "transaction": {
     "title": "交易明细",

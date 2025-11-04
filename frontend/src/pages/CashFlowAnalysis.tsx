@@ -154,14 +154,14 @@ const CashFlowAnalysis: React.FC = () => {
                   className="flex items-center space-x-2 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors shadow-sm"
                 >
                   <Upload className="w-4 h-4" />
-                  <span>导入</span>
+                  <span>{t('common.import')}</span>
                 </button>
                 <button
                   onClick={handleOpenExportModal}
                   className="flex items-center space-x-2 px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors shadow-sm"
                 >
                   <Download className="w-4 h-4" />
-                  <span>导出</span>
+                  <span>{t('common.export')}</span>
                 </button>
               </div>
 
@@ -191,7 +191,7 @@ const CashFlowAnalysis: React.FC = () => {
               >
                 <div className="flex items-center space-x-2">
                   <TrendingUp className="w-4 h-4" />
-                  <span>财务概览</span>
+                  <span>{t('cashFlow.overview')}</span>
                 </div>
               </button>
               <button
@@ -204,7 +204,7 @@ const CashFlowAnalysis: React.FC = () => {
               >
                 <div className="flex items-center space-x-2">
                   <FileText className="w-4 h-4" />
-                  <span>交易明细</span>
+                  <span>{t('cashFlow.transactions')}</span>
                 </div>
               </button>
             </nav>
@@ -217,7 +217,7 @@ const CashFlowAnalysis: React.FC = () => {
             {loading ? (
               <div className="flex items-center justify-center py-12">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="ml-3 text-gray-600">数据加载中...</span>
+                <span className="ml-3 text-gray-600">{t('common.loading')}</span>
               </div>
             ) : !hasFinancialData ? (
               <div className="text-center py-12">
@@ -226,28 +226,28 @@ const CashFlowAnalysis: React.FC = () => {
                     <BarChart3 className="w-16 h-16 mx-auto" />
                   </div>
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    暂无财务数据
+                    {t('cashFlow.noFinancialData')}
                   </h3>
                   <p className="text-gray-500 mb-6">
-                    请先导入交易数据以生成财务分析报表
+                    {t('cashFlow.pleaseImportData')}
                   </p>
                   <button
                     onClick={handleOpenImportModal}
                     className="inline-flex items-center space-x-2 px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors"
                   >
                     <Upload className="w-5 h-5" />
-                    <span>导入数据</span>
+                    <span>{t('cashFlow.importData')}</span>
                   </button>
                 </div>
               </div>
             ) : (
               <>
-                {/* 仪表板概览 */}
+                {/* Dashboard Overview */}
                 <div className="mb-8">
                   <div className="flex items-center space-x-2 mb-6">
                     <TrendingUp className="w-5 h-5 text-blue-600" />
                     <h2 className="text-lg font-semibold text-gray-900">
-                      财务概览
+                      {t('cashFlow.overview')}
                     </h2>
                   </div>
                   <Overview financialData={financialData} loading={loading} />
