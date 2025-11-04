@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from "react-router-dom";
-import { BarChart3, Wallet } from "lucide-react";
+import { BarChart3, LineChart, Wallet } from "lucide-react";
 
 const navigationItems = [
   {
@@ -23,6 +23,17 @@ const navigationItems = [
     textColor: "text-blue-600",
     bgLight: "bg-blue-50",
     path: "/cash-flow-analysis",
+  },
+  {
+    id: "investment-dashboard",
+    name: "投资看板",
+    icon: LineChart,
+    description: "实时持仓 · 账户资金 · 收益趋势",
+    color: "bg-gradient-to-r from-purple-500 to-indigo-600",
+    hoverColor: "hover:from-purple-600 hover:to-indigo-700",
+    textColor: "text-indigo-600",
+    bgLight: "bg-indigo-50",
+    path: "/investment-dashboard",
   },
 ];
 

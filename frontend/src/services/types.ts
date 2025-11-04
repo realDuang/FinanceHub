@@ -123,3 +123,51 @@ export interface TransactionImportResult {
   error_details: ImportErrorDetail[];
   duplicate_details: ImportDuplicateDetail[];
 }
+
+export interface PortfolioCashInfo {
+  currency: string;
+  total_assets: number;
+  available_cash: number;
+  buying_power: number;
+}
+
+export interface PortfolioPosition {
+  symbol: string;
+  name: string;
+  market: string;
+  quantity: number;
+  cost_price: number;
+  last_price: number;
+  market_value: number;
+  pnl: number;
+  pnl_ratio: number;
+  today_pnl: number;
+  today_pnl_ratio: number;
+  currency: string;
+  lot_size?: number | null;
+}
+
+export interface PortfolioEquityPoint {
+  timestamp: string;
+  equity: number;
+  pnl: number;
+}
+
+export interface PortfolioOverview {
+  account_id: string;
+  source: "futu" | "mock";
+  total_market_value: number;
+  total_cost_value: number;
+  total_pnl: number;
+  total_pnl_ratio: number;
+  today_pnl: number;
+  today_pnl_ratio: number;
+  update_time: string;
+  cash: PortfolioCashInfo;
+}
+
+export interface PortfolioSnapshot {
+  overview: PortfolioOverview;
+  positions: PortfolioPosition[];
+  equity_curve: PortfolioEquityPoint[];
+}

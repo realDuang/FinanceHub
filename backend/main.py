@@ -3,6 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import router
 from app.database.connection import create_tables
 import os
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Load environment variables from the project root .env file
+project_root = Path(__file__).resolve().parent.parent
+load_dotenv(project_root / ".env", override=False)
 
 # 创建FastAPI应用实例
 app = FastAPI(

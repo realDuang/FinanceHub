@@ -10,6 +10,7 @@ import BalanceSheet from "./pages/BalanceSheet";
 import Navigation from "./components/Navigation";
 import TransactionImportReview from "./pages/TransactionImportReview";
 import { ImportReviewProvider } from "./context/ImportReviewContext";
+import InvestmentDashboard from "./pages/InvestmentDashboard";
 
 function App() {
   return (
@@ -52,6 +53,10 @@ function App() {
               <Route
                 path="/cash-flow-analysis/*"
                 element={<CashFlowAnalysis />}
+              />
+              <Route
+                path="/investment-dashboard"
+                element={<InvestmentDashboard />}
               />
               <Route
                 path="/transaction-import/review"

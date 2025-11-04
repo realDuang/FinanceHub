@@ -1,6 +1,6 @@
 import enum
 from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
+from typing import Optional, List
 from datetime import datetime
 from typing import Literal
 
@@ -235,3 +235,4 @@ class BalanceSheetData(BaseModel):
     """资产负债表数据模型"""
     assets: List[Asset]
     liabilities: List[Liability]
+

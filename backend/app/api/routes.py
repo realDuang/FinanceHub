@@ -76,7 +76,6 @@ def get_financial_records(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"获取财务记录失败: {str(e)}")
 
-
 # =================================
 # 资产负债表 API
 # =================================

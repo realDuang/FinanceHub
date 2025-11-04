@@ -9,13 +9,23 @@ from app.models.base import Base
 current_dir = os.path.dirname(os.path.abspath(__file__))  # backend/app/database
 backend_dir = os.path.dirname(os.path.dirname(current_dir))  # backend
 project_root = os.path.dirname(backend_dir)  # 项目根目录
-db_path = os.path.join(project_root, "backend", "data", "financial_data.db")
+default_db_path = os.path.join(project_root, "backend", "data", "financial_data.db")
 
-# 确保数据库目录存在
-os.makedirs(os.path.dirname(db_path), exist_ok=True)
+env_database_url = os.getenv("DATABASE_URL")
+if env_database_url and env_database_url.startswith("sqlite:///") and not env_database_url.startswith("sqlite:////"):
+    relative_path = env_database_url.replace("sqlite:///", "", 1)
+    absolute_path = os.path.join(project_root, relative_path)
+    DATABASE_URL = f"sqlite:///{absolute_path}"
+elif env_database_url:
+    DATABASE_URL = env_database_url
+else:
+    DATABASE_URL = f"sqlite:///{default_db_path}"
 
-# 获取数据库URL，默认使用SQLite
-DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{db_path}")
+if DATABASE_URL.startswith("sqlite:///"):
+    sqlite_file_path = DATABASE_URL.replace("sqlite:///", "", 1)
+    os.makedirs(os.path.dirname(sqlite_file_path), exist_ok=True)
+
+print(f"数据库路径: {DATABASE_URL}")  # 调试用
 
 print(f"数据库路径: {DATABASE_URL}")  # 调试用
 
