@@ -41,7 +41,16 @@
     "startDate": "开始日期",
     "endDate": "结束日期",
     "all": "全部",
-    "clear": "清空"
+    "clear": "清空",
+    "year": "年",
+    "month": "月",
+    "dataRange": "数据范围",
+    "customRange": "自定义范围",
+    "selectMonthRange": "选择月份范围",
+    "startMonth": "开始月份",
+    "endMonth": "结束月份",
+    "clearCustomRange": "清除自定义范围",
+    "apply": "确定"
   },
   "balanceSheet": {
     "title": "资产负债表",
@@ -72,7 +81,11 @@
     "deleteSuccess": "删除成功",
     "addError": "添加失败",
     "updateError": "更新失败",
-    "deleteError": "删除失败"
+    "deleteError": "删除失败",
+    "financialOverview": "财务概览",
+    "assetDistribution": "资产分布",
+    "summary": "概要",
+    "details": "详情"
   },
   "cashFlow": {
     "title": "现金流分析",
@@ -94,6 +107,8 @@
     "netCashFlow": "净现金流",
     "avgIncome": "平均收入",
     "avgExpense": "平均支出",
+    "avgConsumption": "平均消费",
+    "recentAvgConsumption": "近期平均消费",
     "monthlyTrend": "月度趋势",
     "categoryDistribution": "类别分布",
     "topExpenses": "主要支出",
@@ -102,7 +117,8 @@
     "importSuccess": "导入成功",
     "exportSuccess": "导出成功",
     "importError": "导入失败",
-    "exportError": "导出失败"
+    "exportError": "导出失败",
+    "financialOverview": "财务概览"
   },
   "transaction": {
     "title": "交易明细",
@@ -147,7 +163,13 @@
     "preview": "预览",
     "reviewBeforeImport": "导入前检查",
     "selectDataSource": "选择数据源",
-    "selectBillType": "选择账单类型"
+    "selectBillType": "选择账单类型",
+    "downloadTemplate": "下载模板",
+    "parseSuccess": "解析成功",
+    "uploadFailed": "上传失败",
+    "parseFailed": "解析失败",
+    "importFailed": "导入失败",
+    "retryPlease": "请重试"
   },
   "export": {
     "title": "导出数据",
@@ -156,7 +178,8 @@
     "exportAll": "导出全部",
     "exportFiltered": "导出筛选结果",
     "downloading": "下载中...",
-    "downloadComplete": "下载完成"
+    "downloadComplete": "下载完成",
+    "exportFailed": "导出失败"
   },
   "investment": {
     "title": "投资看板",
@@ -178,7 +201,9 @@
     "currentPrice": "现价",
     "marketValue": "市值",
     "profit": "盈亏",
-    "profitPercent": "盈亏比例"
+    "profitPercent": "盈亏比例",
+    "noData": "暂无投资数据",
+    "loading": "加载中..."
   },
   "chart": {
     "income": "收入",
@@ -190,7 +215,12 @@
     "month": "月份",
     "amount": "金额",
     "percentage": "百分比",
-    "noDataAvailable": "暂无图表数据"
+    "noDataAvailable": "暂无图表数据",
+    "monthlyIncome": "月度收入",
+    "monthlyExpense": "月度支出",
+    "incomeExpenseTrend": "收支趋势",
+    "expenseByCategory": "类别支出",
+    "topExpenseCategories": "主要支出类别"
   },
   "error": {
     "loadingFailed": "加载失败",

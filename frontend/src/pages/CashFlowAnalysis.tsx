@@ -10,6 +10,7 @@ import {
   Download,
 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import Overview from "../components/CashFlowAnalysis/Overview";
 import MonthlyExpenseChart from "../components/CashFlowAnalysis/MonthlyExpenseChart";
 import TrendChart from "../components/CashFlowAnalysis/TrendChart";
@@ -35,9 +36,10 @@ import {
 } from "../utils/date-utils";
 
 /**
- * 财务管理仪表板
+ * Cash Flow Analysis Dashboard
  */
 const CashFlowAnalysis: React.FC = () => {
+  const { t } = useTranslation();
   const location = useLocation();
   const routerNavigate = useNavigate();
   const [timeRange, setTimeRange] = useState<TimeRange>("all");
@@ -48,16 +50,16 @@ const CashFlowAnalysis: React.FC = () => {
   const [importExportModalDefaultTab, setImportExportModalDefaultTab] =
     useState<"import" | "export">("import");
 
-  // 获取所有数据用于计算日期范围
+  // Get all data for date range calculation
   const { data: allData } = useGetAllFinancialRecords();
 
-  // 根据时间范围计算日期
+  // Calculate date range based on time range
   const dateRange = useMemo(
     () => getDateRangeFromTimeRange(timeRange),
     [timeRange]
   );
 
-  // 计算最新数据的截止时间
+  // Calculate latest data end date
   const latestDataDate = useMemo(
     () => getLatestDataDate(allData || undefined),
     [allData]

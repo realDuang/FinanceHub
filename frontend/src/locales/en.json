@@ -41,7 +41,16 @@
     "startDate": "Start Date",
     "endDate": "End Date",
     "all": "All",
-    "clear": "Clear"
+    "clear": "Clear",
+    "year": "Year",
+    "month": "Month",
+    "dataRange": "Data Range",
+    "customRange": "Custom Range",
+    "selectMonthRange": "Select Month Range",
+    "startMonth": "Start Month",
+    "endMonth": "End Month",
+    "clearCustomRange": "Clear Custom Range",
+    "apply": "Apply"
   },
   "balanceSheet": {
     "title": "Balance Sheet",
@@ -72,7 +81,11 @@
     "deleteSuccess": "Deleted Successfully",
     "addError": "Failed to Add",
     "updateError": "Failed to Update",
-    "deleteError": "Failed to Delete"
+    "deleteError": "Failed to Delete",
+    "financialOverview": "Financial Overview",
+    "assetDistribution": "Asset Distribution",
+    "summary": "Summary",
+    "details": "Details"
   },
   "cashFlow": {
     "title": "Cash Flow Analysis",
@@ -94,6 +107,8 @@
     "netCashFlow": "Net Cash Flow",
     "avgIncome": "Average Income",
     "avgExpense": "Average Expense",
+    "avgConsumption": "Average Consumption",
+    "recentAvgConsumption": "Recent Average Consumption",
     "monthlyTrend": "Monthly Trend",
     "categoryDistribution": "Category Distribution",
     "topExpenses": "Top Expenses",
@@ -102,7 +117,8 @@
     "importSuccess": "Import Successful",
     "exportSuccess": "Export Successful",
     "importError": "Import Failed",
-    "exportError": "Export Failed"
+    "exportError": "Export Failed",
+    "financialOverview": "Financial Overview"
   },
   "transaction": {
     "title": "Transaction Details",
@@ -147,7 +163,13 @@
     "preview": "Preview",
     "reviewBeforeImport": "Review Before Import",
     "selectDataSource": "Select Data Source",
-    "selectBillType": "Select Bill Type"
+    "selectBillType": "Select Bill Type",
+    "downloadTemplate": "Download Template",
+    "parseSuccess": "Parse Successful",
+    "uploadFailed": "Upload Failed",
+    "parseFailed": "Parse Failed",
+    "importFailed": "Import Failed",
+    "retryPlease": "Please Retry"
   },
   "export": {
     "title": "Export Data",
@@ -156,7 +178,8 @@
     "exportAll": "Export All",
     "exportFiltered": "Export Filtered Results",
     "downloading": "Downloading...",
-    "downloadComplete": "Download Complete"
+    "downloadComplete": "Download Complete",
+    "exportFailed": "Export Failed"
   },
   "investment": {
     "title": "Investment Dashboard",
@@ -178,7 +201,9 @@
     "currentPrice": "Current Price",
     "marketValue": "Market Value",
     "profit": "Profit/Loss",
-    "profitPercent": "Profit/Loss %"
+    "profitPercent": "Profit/Loss %",
+    "noData": "No Investment Data",
+    "loading": "Loading..."
   },
   "chart": {
     "income": "Income",
@@ -190,7 +215,12 @@
     "month": "Month",
     "amount": "Amount",
     "percentage": "Percentage",
-    "noDataAvailable": "No Chart Data Available"
+    "noDataAvailable": "No Chart Data Available",
+    "monthlyIncome": "Monthly Income",
+    "monthlyExpense": "Monthly Expense",
+    "incomeExpenseTrend": "Income & Expense Trend",
+    "expenseByCategory": "Expense by Category",
+    "topExpenseCategories": "Top Expense Categories"
   },
   "error": {
     "loadingFailed": "Loading Failed",
