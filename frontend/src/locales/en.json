@@ -44,6 +44,7 @@
     "clear": "Clear",
     "year": "Year",
     "month": "Month",
+    "page": "Page",
     "dataRange": "Data Range",
     "customRange": "Custom Range",
     "selectMonthRange": "Select Month Range",
@@ -118,7 +119,11 @@
     "exportSuccess": "Export Successful",
     "importError": "Import Failed",
     "exportError": "Export Failed",
-    "financialOverview": "Financial Overview"
+    "financialOverview": "Financial Overview",
+    "salary": "Salary",
+    "socialExpenses": "Social",
+    "noFinancialData": "No Financial Data",
+    "pleaseImportData": "Please import transaction data to generate financial analysis reports"
   },
   "transaction": {
     "title": "Transaction Details",
@@ -221,6 +226,27 @@
     "incomeExpenseTrend": "Income & Expense Trend",
     "expenseByCategory": "Expense by Category",
     "topExpenseCategories": "Top Expense Categories"
+  },
+  "categories": {
+    "housing": "Housing",
+    "dining": "Dining",
+    "living": "Living",
+    "entertainment": "Entertainment",
+    "transportation": "Transportation",
+    "travel": "Travel",
+    "gifts": "Gifts",
+    "transactions": "Transactions"
+  },
+  "dateFormat": {
+    "allData": "All Data",
+    "yearEnd": " End",
+    "monthEnd": " End",
+    "fullYear": " Full Year",
+    "to": " - "
+  },
+  "currency": {
+    "symbol": "$",
+    "locale": "en-US"
   },
   "error": {
     "loadingFailed": "Loading Failed",

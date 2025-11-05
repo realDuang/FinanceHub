@@ -14,6 +14,7 @@ import {
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import { FinancialAggregationRecord } from "../../services/types";
 import { formatCurrency, formatDate } from "../../utils/chart-utils";
 
@@ -24,124 +25,128 @@ interface FinancialDataTableProps {
 
 const columnHelper = createColumnHelper<FinancialAggregationRecord>();
 
-const formatThresholdNumber = (
-  value: number,
-  redThreshold: number,
-  greenThreshold: number
-) => {
-  return (
-    <span
-      className={`font-medium ${
-        value <= redThreshold
-          ? "text-red-600"
-          : value >= greenThreshold
-          ? "text-green-600"
-          : ""
-      }`}
-    >
-      {formatCurrency(value)}
-    </span>
-  );
-};
-
 const FinancialDataTable: React.FC<FinancialDataTableProps> = ({
   data,
   loading = false,
 }) => {
+  const { t, i18n } = useTranslation();
   const [sorting, setSorting] = useState<SortingState>([
     { id: "month_date", desc: true },
   ]);
+
+  const currencySymbol = t('currency.symbol');
+  const currencyLocale = t('currency.locale');
+
+  const formatThresholdNumber = (
+    value: number,
+    redThreshold: number,
+    greenThreshold: number
+  ) => {
+    return (
+      <span
+        className={`font-medium ${
+          value <= redThreshold
+            ? "text-red-600"
+            : value >= greenThreshold
+            ? "text-green-600"
+            : ""
+        }`}
+      >
+        {formatCurrency(value, currencySymbol, currencyLocale)}
+      </span>
+    );
+  };
 
   // 定义列配置
   const columns = useMemo(
     () => [
       columnHelper.accessor("month_date", {
-        header: "月份",
+        header: t('chart.month'),
         cell: (info) => formatDate(info.getValue(), "YYYY-MM"),
         enableSorting: true,
         size: 120,
       }),
 
       columnHelper.accessor("housing", {
-        header: "住房",
-        cell: (info) => formatCurrency(info.getValue()),
+        header: t('categories.housing'),
+        cell: (info) => formatCurrency(info.getValue(), currencySymbol, currencyLocale),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("dining", {
-        header: "餐饮",
+        header: t('categories.dining'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("living", {
-        header: "生活",
+        header: t('categories.living'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("entertainment", {
-        header: "娱乐",
+        header: t('categories.entertainment'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("transportation", {
-        header: "交通",
+        header: t('categories.transportation'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("travel", {
-        header: "旅行",
+        header: t('categories.travel'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("gifts", {
-        header: "礼品",
+        header: t('categories.gifts'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("social_expenses", {
-        header: "人情",
+        header: t('cashFlow.socialExpenses'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("transactions", {
-        header: "交易",
+        header: t('categories.transactions'),
         cell: (info) => formatThresholdNumber(info.getValue(), -3000, 3000),
         enableSorting: true,
         size: 80,
       }),
       columnHelper.accessor("salary", {
-        header: "工资",
-        cell: (info) => formatCurrency(info.getValue()),
+        header: t('cashFlow.salary'),
+        cell: (info) => formatCurrency(info.getValue(), currencySymbol, currencyLocale),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("balance", {
-        header: "结余",
-        cell: (info) => formatCurrency(info.getValue()),
+        header: t('cashFlow.balance'),
+        cell: (info) => formatCurrency(info.getValue(), currencySymbol, currencyLocale),
         enableSorting: true,
         size: 100,
       }),
       columnHelper.accessor("avg_consumption", {
-        header: "均匀消费支出(房租均摊)",
+        header: t('cashFlow.avgConsumption'),
         cell: (info) => formatThresholdNumber(-info.getValue(), -18000, -13000),
         enableSorting: true,
         size: 150,
       }),
       columnHelper.accessor("recent_avg_consumption", {
-        header: "近三月均匀消费支出",
+        header: t('cashFlow.recentAvgConsumption'),
         cell: (info) => formatThresholdNumber(-info.getValue(), -18000, -13000),
         enableSorting: true,
         size: 150,
       }),
     ],
-    []
+    [t, currencySymbol, currencyLocale]
   );
 
   const table = useReactTable({
@@ -178,14 +183,14 @@ const FinancialDataTable: React.FC<FinancialDataTableProps> = ({
 
   return (
     <div className="bg-white rounded-xl shadow-lg overflow-hidden">
-      {/* 头部 */}
+      {/* Header */}
       <div className="p-6 border-b border-gray-200">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-xl font-bold text-gray-900">财务数据明细</h2>
+          <h2 className="text-xl font-bold text-gray-900">{t('cashFlow.financialOverview')}</h2>
         </div>
 
-        {/* 统计信息 */}
-        <div className="text-sm text-gray-600">共 {data.length} 条记录</div>
+        {/* Statistics */}
+        <div className="text-sm text-gray-600">{t('transaction.totalRecords', { count: data.length })}</div>
       </div>
 
       {/* 表格 */}
@@ -263,13 +268,12 @@ const FinancialDataTable: React.FC<FinancialDataTableProps> = ({
               </option>
             ))}
           </select>
-          <span className="text-sm text-gray-700">条记录</span>
+          <span className="text-sm text-gray-700">{t('common.total')}</span>
         </div>
 
         <div className="flex items-center space-x-2">
           <span className="text-sm text-gray-700">
-            第 {table.getState().pagination.pageIndex + 1} 页，共{" "}
-            {table.getPageCount()} 页
+            {t('common.page')} {table.getState().pagination.pageIndex + 1} / {table.getPageCount()}
           </span>
           <button
             onClick={() => table.previousPage()}
@@ -277,14 +281,14 @@ const FinancialDataTable: React.FC<FinancialDataTableProps> = ({
             className="flex items-center px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
-            上一页
+            {t('common.previous')}
           </button>
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
             className="flex items-center px-3 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            下一页
+            {t('common.next')}
             <ChevronRight className="w-4 h-4 ml-1" />
           </button>
         </div>

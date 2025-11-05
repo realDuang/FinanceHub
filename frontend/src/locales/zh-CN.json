@@ -44,6 +44,7 @@
     "clear": "清空",
     "year": "年",
     "month": "月",
+    "page": "第",
     "dataRange": "数据范围",
     "customRange": "自定义范围",
     "selectMonthRange": "选择月份范围",
@@ -118,7 +119,11 @@
     "exportSuccess": "导出成功",
     "importError": "导入失败",
     "exportError": "导出失败",
-    "financialOverview": "财务概览"
+    "financialOverview": "财务概览",
+    "salary": "工资",
+    "socialExpenses": "人情",
+    "noFinancialData": "暂无财务数据",
+    "pleaseImportData": "请先导入交易数据以生成财务分析报表"
   },
   "transaction": {
     "title": "交易明细",
@@ -221,6 +226,27 @@
     "incomeExpenseTrend": "收支趋势",
     "expenseByCategory": "类别支出",
     "topExpenseCategories": "主要支出类别"
+  },
+  "categories": {
+    "housing": "住房",
+    "dining": "餐饮",
+    "living": "生活",
+    "entertainment": "娱乐",
+    "transportation": "交通",
+    "travel": "旅行",
+    "gifts": "礼物",
+    "transactions": "交易"
+  },
+  "dateFormat": {
+    "allData": "全部数据",
+    "yearEnd": "年底",
+    "monthEnd": "月底",
+    "fullYear": "年全年",
+    "to": " - "
+  },
+  "currency": {
+    "symbol": "￥",
+    "locale": "zh-CN"
   },
   "error": {
     "loadingFailed": "加载失败",
