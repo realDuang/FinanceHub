@@ -51,16 +51,25 @@
     "startMonth": "开始月份",
     "endMonth": "结束月份",
     "clearCustomRange": "清除自定义范围",
-    "apply": "确定"
+    "apply": "确定",
+    "refresh": "刷新"
   },
   "balanceSheet": {
     "title": "资产负债表",
+    "pageTitle": "资产负债管理",
+    "pageDescription": "管理您的个人财务，追踪资产与负债，实现财富增长目标",
+    "loadingData": "加载资产负债数据中...",
+    "loadErrorTitle": "加载数据失败",
     "assets": "资产",
     "liabilities": "负债",
     "currentAssets": "流动资产",
+    "currentAssetsHint": "（现金及等价物）",
     "nonCurrentAssets": "非流动资产",
+    "nonCurrentAssetsHint": "（长期投资）",
     "currentLiabilities": "流动负债",
+    "currentLiabilitiesHint": "（短期债务）",
     "nonCurrentLiabilities": "非流动负债",
+    "nonCurrentLiabilitiesHint": "（长期债务）",
     "totalAssets": "总资产",
     "totalLiabilities": "总负债",
     "netWorth": "净资产",
@@ -85,8 +94,80 @@
     "deleteError": "删除失败",
     "financialOverview": "财务概览",
     "assetDistribution": "资产分布",
-    "summary": "概要",
-    "details": "详情"
+    "summaryTab": "概要",
+    "detailsTab": "详情",
+    "modals": {
+      "title": {
+        "add": {
+          "asset": "添加资产项目",
+          "liability": "添加负债项目"
+        },
+        "edit": {
+          "asset": "编辑资产项目",
+          "liability": "编辑负债项目"
+        }
+      },
+      "nameLabel": {
+        "asset": "资产名称",
+        "liability": "负债名称"
+      },
+      "namePlaceholder": {
+        "asset": "如：银行存款、房产等",
+        "liability": "如：信用卡债务、房贷等"
+      },
+      "amountLabel": "金额 ({{symbol}})",
+      "categoryLabel": "分类",
+      "categoryDescription": {
+        "asset": {
+          "current": "现金、存款、投资等可快速变现的资产",
+          "nonCurrent": "房产、车辆等长期持有的资产"
+        },
+        "liability": {
+          "current": "信用卡债务、短期借款等",
+          "nonCurrent": "房贷、车贷等长期债务"
+        }
+      }
+    },
+    "summary": {
+      "title": "财务健康分析",
+      "currentRatio": {
+        "label": "流动比率",
+        "status": {
+          "excellent": "优秀",
+          "good": "良好",
+          "warning": "需改善"
+        },
+        "formula": "流动资产 ÷ 流动负债"
+      },
+      "debtRatio": {
+        "label": "负债权益比",
+        "status": {
+          "excellent": "优秀",
+          "good": "良好",
+          "warning": "需改善"
+        },
+        "formula": "总负债 ÷ 净资产"
+      },
+      "netWorth": {
+        "label": "资产净值率",
+        "status": {
+          "positive": "健康",
+          "negative": "风险"
+        },
+        "formula": "净资产 ÷ 总资产"
+      },
+      "totals": {
+        "assets": "总资产",
+        "liabilities": "总负债",
+        "netWorth": "净资产"
+      }
+    },
+    "visualization": {
+      "noDataTitle": "暂无资产数据",
+      "noDataDescription": "添加资产项目后，这里将显示您的资产组合分布图表",
+      "distributionTitle": "资产组合分布",
+      "tooltip": "{{label}}：{{value}} ({{percentage}})"
+    }
   },
   "cashFlow": {
     "title": "现金流分析",
@@ -208,7 +289,59 @@
     "profit": "盈亏",
     "profitPercent": "盈亏比例",
     "noData": "暂无投资数据",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "pageDescription": "实时持仓、可用资金与收益洞察，助力你的投资规划。",
+    "account": {
+      "label": "账户"
+    },
+    "dataSource": {
+      "label": "数据源"
+    },
+    "updatedAt": {
+      "label": "更新于"
+    },
+    "loadingData": "正在准备投资数据...",
+    "summaryCards": {
+      "totalMarketValue": "总市值",
+      "cost": "成本 {{value}}",
+      "unrealizedPnL": "未实现盈亏",
+      "pnlRatio": "收益率 {{value}}",
+      "todayPnL": "当日盈亏",
+      "todayRatio": "当日收益率 {{value}}"
+    },
+    "cashCard": {
+      "title": "账户资金",
+      "currency": "币种",
+      "totalAssets": "资产合计",
+      "availableCash": "可用现金",
+      "buyingPower": "可用购买力"
+    },
+    "equityTrendChart": {
+      "title": "权益趋势",
+      "subtitle": "近30日",
+      "loading": "权益曲线加载中...",
+      "empty": "暂无权益历史数据",
+      "equityLabel": "权益",
+      "pnlLabel": "盈亏"
+    },
+    "positions": {
+      "title": "当前持仓",
+      "count": "共 {{count}} 项",
+      "loading": "持仓数据加载中...",
+      "empty": "暂无持仓数据",
+      "headers": {
+        "symbol": "代码",
+        "name": "名称",
+        "quantity": "数量",
+        "cost": "成本",
+        "lastPrice": "最新价",
+        "marketValue": "市值",
+        "unrealizedPnL": "未实现盈亏",
+        "unrealizedPct": "未实现%",
+        "todayPnL": "当日盈亏",
+        "todayPct": "当日%"
+      }
+    }
   },
   "chart": {
     "income": "收入",

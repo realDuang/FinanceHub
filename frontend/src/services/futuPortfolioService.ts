@@ -346,7 +346,8 @@ class FutuPortfolioService {
       })
     );
 
-    const accList = (response as ProtoLike)?.s2c?.accList;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const accList = (response as any)?.s2c?.accList;
     if (!Array.isArray(accList) || !accList.length) {
       throw new Error("未获取到可用的交易账户");
     }
@@ -360,11 +361,13 @@ class FutuPortfolioService {
     }
 
     if (!selected) {
-      selected = accList.find((item) => toNumber(item.trdEnv) === tradeEnv);
+      selected =
+        accList.find((item) => toNumber(item.trdEnv) === tradeEnv) ??
+        accList[0];
     }
 
     if (!selected) {
-      selected = accList[0];
+      throw new Error("未找到匹配的交易账户");
     }
 
     const accId = toIdString(selected.accID);
@@ -423,7 +426,8 @@ class FutuPortfolioService {
             },
           })
         );
-        const rawList = (response as ProtoLike)?.s2c?.positionList;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const rawList = (response as any).s2c?.positionList;
         if (Array.isArray(rawList)) {
           rawList.forEach((raw) => {
             positions.push(this.normalizePosition(raw as ProtoLike));
@@ -456,7 +460,8 @@ class FutuPortfolioService {
           },
         })
       );
-      const funds = (response as ProtoLike)?.s2c?.funds;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const funds = (response as any)?.s2c?.funds;
       if (funds) {
         return this.normalizeFunds(funds as ProtoLike);
       }

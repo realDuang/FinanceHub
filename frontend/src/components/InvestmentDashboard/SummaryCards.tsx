@@ -1,47 +1,63 @@
+import { useMemo } from "react";
 import { Activity, DollarSign, TrendingUp } from "lucide-react";
+import { useTranslation } from "react-i18next";
 import type { PortfolioOverview } from "../../services/types";
 
 interface SummaryCardsProps {
   overview: PortfolioOverview;
 }
 
-const currencyFormatter = (currency: string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  });
-
-const percentFormatter = new Intl.NumberFormat("en-US", {
-  style: "percent",
-  maximumFractionDigits: 2,
-});
-
 const SummaryCards: React.FC<SummaryCardsProps> = ({ overview }) => {
-  const fmt = currencyFormatter(overview.cash.currency || "USD");
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
+
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: overview.cash.currency || "USD",
+        maximumFractionDigits: 2,
+      }),
+    [locale, overview.cash.currency]
+  );
+
+  const percentFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "percent",
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
 
   const cards = [
     {
       id: "market-value",
-      title: "Total Market Value",
-      value: fmt.format(overview.total_market_value),
-      subValue: `Cost ${fmt.format(overview.total_cost_value)}`,
+      title: t("investment.summaryCards.totalMarketValue"),
+      value: currencyFormatter.format(overview.total_market_value),
+      subValue: t("investment.summaryCards.cost", {
+        value: currencyFormatter.format(overview.total_cost_value),
+      }),
       icon: <TrendingUp className="w-5 h-5 text-white" />,
       gradient: "from-emerald-500 to-teal-500",
     },
     {
       id: "overall-pnl",
-      title: "Unrealized P&L",
-      value: fmt.format(overview.total_pnl),
-      subValue: percentFormatter.format(overview.total_pnl_ratio / 100 || 0),
+      title: t("investment.summaryCards.unrealizedPnL"),
+      value: currencyFormatter.format(overview.total_pnl),
+      subValue: t("investment.summaryCards.pnlRatio", {
+        value: percentFormatter.format((overview.total_pnl_ratio || 0) / 100),
+      }),
       icon: <DollarSign className="w-5 h-5 text-white" />,
       gradient: "from-blue-500 to-indigo-500",
     },
     {
       id: "today-pnl",
-      title: "Today's P&L",
-      value: fmt.format(overview.today_pnl),
-      subValue: percentFormatter.format(overview.today_pnl_ratio / 100 || 0),
+      title: t("investment.summaryCards.todayPnL"),
+      value: currencyFormatter.format(overview.today_pnl),
+      subValue: t("investment.summaryCards.todayRatio", {
+        value: percentFormatter.format((overview.today_pnl_ratio || 0) / 100),
+      }),
       icon: <Activity className="w-5 h-5 text-white" />,
       gradient: "from-amber-500 to-orange-500",
     },

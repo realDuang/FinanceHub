@@ -1,3 +1,5 @@
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { PortfolioPosition } from "../../services/types";
 
 interface PositionsTableProps {
@@ -5,27 +7,51 @@ interface PositionsTableProps {
   loading: boolean;
 }
 
-const currencyValue = (value: number, currency: string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  }).format(value);
-
-const numberValue = new Intl.NumberFormat("en-US", {
-  maximumFractionDigits: 2,
-});
-
-const percentValue = new Intl.NumberFormat("en-US", {
-  style: "percent",
-  maximumFractionDigits: 2,
-});
-
 const PositionsTable: React.FC<PositionsTableProps> = ({ positions, loading }) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
+
+  const numberFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const percentFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "percent",
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const getCurrencyFormatter = useMemo(
+    () => new Map<string, Intl.NumberFormat>(),
+    [locale]
+  );
+
+  const formatCurrency = (value: number, currency: string) => {
+    if (!getCurrencyFormatter.has(currency)) {
+      getCurrencyFormatter.set(
+        currency,
+        new Intl.NumberFormat(locale, {
+          style: "currency",
+          currency,
+          maximumFractionDigits: 2,
+        })
+      );
+    }
+
+    return getCurrencyFormatter.get(currency)!.format(value);
+  };
+
   if (loading) {
     return (
       <div className="bg-white shadow-lg rounded-2xl p-6 flex items-center justify-center h-64">
-        <span className="text-gray-500">Loading positions...</span>
+        <span className="text-gray-500">{t("investment.positions.loading")}</span>
       </div>
     );
   }
@@ -33,7 +59,7 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ positions, loading }) =
   if (!positions.length) {
     return (
       <div className="bg-white shadow-lg rounded-2xl p-6 flex items-center justify-center h-64">
-        <span className="text-gray-500">No positions to display</span>
+        <span className="text-gray-500">{t("investment.positions.empty")}</span>
       </div>
     );
   }
@@ -43,42 +69,46 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ positions, loading }) =
   return (
     <div className="bg-white shadow-lg rounded-2xl overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">Current Positions</h3>
-        <span className="text-sm text-gray-400">{positions.length} items</span>
+        <h3 className="text-lg font-semibold text-gray-800">
+          {t("investment.positions.title")}
+        </h3>
+        <span className="text-sm text-gray-400">
+          {t("investment.positions.count", { count: positions.length })}
+        </span>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Symbol
+                {t("investment.positions.headers.symbol")}
               </th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Name
+                {t("investment.positions.headers.name")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Quantity
+                {t("investment.positions.headers.quantity")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Cost
+                {t("investment.positions.headers.cost")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Last Price
+                {t("investment.positions.headers.lastPrice")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Market Value
+                {t("investment.positions.headers.marketValue")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Unrealized P&L
+                {t("investment.positions.headers.unrealizedPnL")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Unrealized %
+                {t("investment.positions.headers.unrealizedPct")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Today P&L
+                {t("investment.positions.headers.todayPnL")}
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Today %
+                {t("investment.positions.headers.todayPct")}
               </th>
             </tr>
           </thead>
@@ -97,44 +127,44 @@ const PositionsTable: React.FC<PositionsTableProps> = ({ positions, loading }) =
                   {position.name}
                 </td>
                 <td className="px-6 py-3 whitespace-nowrap text-right text-sm text-gray-600">
-                  {numberValue.format(position.quantity)}
+                  {numberFormatter.format(position.quantity)}
                 </td>
                 <td className="px-6 py-3 whitespace-nowrap text-right text-sm text-gray-600">
-                  {currencyValue(position.cost_price, rowCurrency)}
+                  {formatCurrency(position.cost_price, rowCurrency)}
                 </td>
                 <td className="px-6 py-3 whitespace-nowrap text-right text-sm text-gray-600">
-                  {currencyValue(position.last_price, rowCurrency)}
+                  {formatCurrency(position.last_price, rowCurrency)}
                 </td>
                 <td className="px-6 py-3 whitespace-nowrap text-right text-sm font-semibold text-gray-900">
-                  {currencyValue(position.market_value, rowCurrency)}
+                  {formatCurrency(position.market_value, rowCurrency)}
                 </td>
                 <td
                   className={`px-6 py-3 whitespace-nowrap text-right text-sm font-semibold ${
                     position.pnl >= 0 ? "text-emerald-600" : "text-rose-600"
                   }`}
                 >
-                  {currencyValue(position.pnl, rowCurrency)}
+                  {formatCurrency(position.pnl, rowCurrency)}
                 </td>
                 <td
                   className={`px-6 py-3 whitespace-nowrap text-right text-sm ${
                     position.pnl_ratio >= 0 ? "text-emerald-600" : "text-rose-600"
                   }`}
                 >
-                  {percentValue.format((position.pnl_ratio || 0) / 100)}
+                  {percentFormatter.format((position.pnl_ratio || 0) / 100)}
                 </td>
                 <td
                   className={`px-6 py-3 whitespace-nowrap text-right text-sm ${
                     position.today_pnl >= 0 ? "text-emerald-600" : "text-rose-600"
                   }`}
                 >
-                  {currencyValue(position.today_pnl, rowCurrency)}
+                  {formatCurrency(position.today_pnl, rowCurrency)}
                 </td>
                 <td
                   className={`px-6 py-3 whitespace-nowrap text-right text-sm ${
                     position.today_pnl_ratio >= 0 ? "text-emerald-600" : "text-rose-600"
                   }`}
                 >
-                  {percentValue.format((position.today_pnl_ratio || 0) / 100)}
+                  {percentFormatter.format((position.today_pnl_ratio || 0) / 100)}
                 </td>
               </tr>
               );

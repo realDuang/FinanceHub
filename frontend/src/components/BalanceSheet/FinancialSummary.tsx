@@ -1,22 +1,47 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { BarChart3, TrendingUp, AlertCircle, CheckCircle } from "lucide-react";
 import type { FinancialRatios } from "../../interfaces";
+import { useTranslation } from "react-i18next";
 
 interface FinancialSummaryProps {
   ratios: FinancialRatios;
 }
 
 const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("zh-CN", {
-      style: "currency",
-      currency: "CNY",
-    }).format(amount);
-  };
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
 
-  const formatRatio = (ratio: number) => {
-    return ratio.toFixed(2);
-  };
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "CNY",
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const ratioFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const percentFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "percent",
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    [locale]
+  );
+
+  const formatCurrency = (amount: number) => currencyFormatter.format(amount);
+  const formatRatio = (ratio: number) => ratioFormatter.format(ratio);
 
   const getCurrentRatioStatus = () => {
     if (ratios.currentRatio >= 2)
@@ -72,7 +97,9 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
       <div className="bg-white rounded-2xl shadow-lg p-6">
         <div className="flex items-center gap-3 mb-6">
           <BarChart3 className="h-6 w-6 text-blue-600" />
-          <h2 className="text-xl font-semibold text-slate-800">财务健康分析</h2>
+          <h2 className="text-xl font-semibold text-slate-800">
+            {t("balanceSheet.summary.title")}
+          </h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -88,19 +115,17 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
               {formatRatio(ratios.currentRatio)}
             </div>
             <div className="text-sm font-medium text-slate-600 mb-2">
-              流动比率
+              {t("balanceSheet.summary.currentRatio.label")}
             </div>
             <div
               className={`text-xs px-3 py-1 rounded-full ${currentRatioStatus.bgColor} ${currentRatioStatus.color} font-medium`}
             >
-              {ratios.currentRatio >= 2
-                ? "优秀"
-                : ratios.currentRatio >= 1
-                ? "良好"
-                : "需改善"}
+              {t(
+                `balanceSheet.summary.currentRatio.status.${currentRatioStatus.status}`
+              )}
             </div>
             <div className="text-xs text-slate-500 mt-2">
-              流动资产 ÷ 流动负债
+              {t("balanceSheet.summary.currentRatio.formula")}
             </div>
           </div>
 
@@ -118,18 +143,18 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
                 : "∞"}
             </div>
             <div className="text-sm font-medium text-slate-600 mb-2">
-              负债权益比
+              {t("balanceSheet.summary.debtRatio.label")}
             </div>
             <div
               className={`text-xs px-3 py-1 rounded-full ${debtRatioStatus.bgColor} ${debtRatioStatus.color} font-medium`}
             >
-              {ratios.debtToEquityRatio <= 0.3
-                ? "优秀"
-                : ratios.debtToEquityRatio <= 0.6
-                ? "良好"
-                : "需改善"}
+              {t(
+                `balanceSheet.summary.debtRatio.status.${debtRatioStatus.status}`
+              )}
             </div>
-            <div className="text-xs text-slate-500 mt-2">总负债 ÷ 净资产</div>
+            <div className="text-xs text-slate-500 mt-2">
+              {t("balanceSheet.summary.debtRatio.formula")}
+            </div>
           </div>
 
           <div className="text-center">
@@ -149,10 +174,14 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
                 ratios.netWorth >= 0 ? "text-green-600" : "text-red-600"
               }`}
             >
-              {((ratios.netWorth / ratios.totalAssets) * 100).toFixed(1)}%
+              {percentFormatter.format(
+                ratios.totalAssets === 0
+                  ? 0
+                  : ratios.netWorth / ratios.totalAssets
+              )}
             </div>
             <div className="text-sm font-medium text-slate-600 mb-2">
-              资产净值率
+              {t("balanceSheet.summary.netWorth.label")}
             </div>
             <div
               className={`text-xs px-3 py-1 rounded-full ${
@@ -161,9 +190,13 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
                   : "bg-red-100 text-red-600"
               } font-medium`}
             >
-              {ratios.netWorth >= 0 ? "健康" : "风险"}
+              {ratios.netWorth >= 0
+                ? t("balanceSheet.summary.netWorth.status.positive")
+                : t("balanceSheet.summary.netWorth.status.negative")}
             </div>
-            <div className="text-xs text-slate-500 mt-2">净资产 ÷ 总资产</div>
+            <div className="text-xs text-slate-500 mt-2">
+              {t("balanceSheet.summary.netWorth.formula")}
+            </div>
           </div>
         </div>
 
@@ -171,7 +204,7 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
           <div className="grid md:grid-cols-3 gap-6 text-center">
             <div>
               <div className="text-lg font-semibold text-slate-600 mb-1">
-                总资产
+                {t("balanceSheet.summary.totals.assets")}
               </div>
               <div className="text-2xl font-bold text-blue-600">
                 {formatCurrency(ratios.totalAssets)}
@@ -179,7 +212,7 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
             </div>
             <div>
               <div className="text-lg font-semibold text-slate-600 mb-1">
-                总负债
+                {t("balanceSheet.summary.totals.liabilities")}
               </div>
               <div className="text-2xl font-bold text-red-600">
                 {formatCurrency(ratios.totalLiabilities)}
@@ -187,7 +220,7 @@ const FinancialSummary: React.FC<FinancialSummaryProps> = ({ ratios }) => {
             </div>
             <div>
               <div className="text-lg font-semibold text-slate-600 mb-1">
-                净资产
+                {t("balanceSheet.summary.totals.netWorth")}
               </div>
               <div
                 className={`text-2xl font-bold ${

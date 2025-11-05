@@ -51,16 +51,25 @@
     "startMonth": "Start Month",
     "endMonth": "End Month",
     "clearCustomRange": "Clear Custom Range",
-    "apply": "Apply"
+    "apply": "Apply",
+    "refresh": "Refresh"
   },
   "balanceSheet": {
     "title": "Balance Sheet",
+    "pageTitle": "Balance Sheet Manager",
+    "pageDescription": "Manage your personal finances, track assets and liabilities, and stay on top of your wealth goals.",
+    "loadingData": "Loading balance sheet data...",
+    "loadErrorTitle": "Failed to load data",
     "assets": "Assets",
     "liabilities": "Liabilities",
     "currentAssets": "Current Assets",
+    "currentAssetsHint": "(Cash & equivalents)",
     "nonCurrentAssets": "Non-Current Assets",
+    "nonCurrentAssetsHint": "(Long-term investments)",
     "currentLiabilities": "Current Liabilities",
+    "currentLiabilitiesHint": "(Short-term debt)",
     "nonCurrentLiabilities": "Non-Current Liabilities",
+    "nonCurrentLiabilitiesHint": "(Long-term debt)",
     "totalAssets": "Total Assets",
     "totalLiabilities": "Total Liabilities",
     "netWorth": "Net Worth",
@@ -85,8 +94,80 @@
     "deleteError": "Failed to Delete",
     "financialOverview": "Financial Overview",
     "assetDistribution": "Asset Distribution",
-    "summary": "Summary",
-    "details": "Details"
+    "summaryTab": "Summary",
+    "detailsTab": "Details",
+    "modals": {
+      "title": {
+        "add": {
+          "asset": "Add Asset Item",
+          "liability": "Add Liability Item"
+        },
+        "edit": {
+          "asset": "Edit Asset Item",
+          "liability": "Edit Liability Item"
+        }
+      },
+      "nameLabel": {
+        "asset": "Asset Name",
+        "liability": "Liability Name"
+      },
+      "namePlaceholder": {
+        "asset": "e.g., Savings account, property",
+        "liability": "e.g., Credit card debt, mortgage"
+      },
+      "amountLabel": "Amount ({{symbol}})",
+      "categoryLabel": "Category",
+      "categoryDescription": {
+        "asset": {
+          "current": "Cash, deposits, or investments that can be liquidated quickly",
+          "nonCurrent": "Property, vehicles, and other long-term holdings"
+        },
+        "liability": {
+          "current": "Credit cards, short-term loans, and similar obligations",
+          "nonCurrent": "Mortgage, auto loan, and other long-term debt"
+        }
+      }
+    },
+    "summary": {
+      "title": "Financial Health Overview",
+      "currentRatio": {
+        "label": "Current Ratio",
+        "status": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "warning": "Needs Attention"
+        },
+        "formula": "Current assets ÷ Current liabilities"
+      },
+      "debtRatio": {
+        "label": "Debt to Equity Ratio",
+        "status": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "warning": "Needs Attention"
+        },
+        "formula": "Total liabilities ÷ Net worth"
+      },
+      "netWorth": {
+        "label": "Net Worth Ratio",
+        "status": {
+          "positive": "Healthy",
+          "negative": "At Risk"
+        },
+        "formula": "Net worth ÷ Total assets"
+      },
+      "totals": {
+        "assets": "Total Assets",
+        "liabilities": "Total Liabilities",
+        "netWorth": "Net Worth"
+      }
+    },
+    "visualization": {
+      "noDataTitle": "No asset data yet",
+      "noDataDescription": "Add your assets to visualize the composition of your portfolio here.",
+      "distributionTitle": "Asset Allocation",
+      "tooltip": "{{label}}: {{value}} ({{percentage}})"
+    }
   },
   "cashFlow": {
     "title": "Cash Flow Analysis",
@@ -208,7 +289,59 @@
     "profit": "Profit/Loss",
     "profitPercent": "Profit/Loss %",
     "noData": "No Investment Data",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "pageDescription": "Real-time holdings, cash availability, and performance insights to support your investment planning.",
+    "account": {
+      "label": "Account"
+    },
+    "dataSource": {
+      "label": "Data Source"
+    },
+    "updatedAt": {
+      "label": "Updated"
+    },
+    "loadingData": "Preparing your investment data...",
+    "summaryCards": {
+      "totalMarketValue": "Total Market Value",
+      "cost": "Cost {{value}}",
+      "unrealizedPnL": "Unrealized P&L",
+      "pnlRatio": "Return {{value}}",
+      "todayPnL": "Today's P&L",
+      "todayRatio": "Daily Return {{value}}"
+    },
+    "cashCard": {
+      "title": "Account Cash",
+      "currency": "Currency",
+      "totalAssets": "Total Assets",
+      "availableCash": "Available Cash",
+      "buyingPower": "Buying Power"
+    },
+    "equityTrendChart": {
+      "title": "Equity Trend",
+      "subtitle": "Last 30 days",
+      "loading": "Loading equity curve...",
+      "empty": "No equity history available",
+      "equityLabel": "Equity",
+      "pnlLabel": "P&L"
+    },
+    "positions": {
+      "title": "Current Positions",
+      "count": "{{count}} items",
+      "loading": "Loading positions...",
+      "empty": "No positions to display",
+      "headers": {
+        "symbol": "Symbol",
+        "name": "Name",
+        "quantity": "Quantity",
+        "cost": "Cost",
+        "lastPrice": "Last Price",
+        "marketValue": "Market Value",
+        "unrealizedPnL": "Unrealized P&L",
+        "unrealizedPct": "Unrealized %",
+        "todayPnL": "Today P&L",
+        "todayPct": "Today %"
+      }
+    }
   },
   "chart": {
     "income": "Income",

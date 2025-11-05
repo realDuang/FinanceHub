@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import {
   Plus,
   Edit2,
@@ -14,6 +14,7 @@ import type {
   LiabilityItem,
   FinancialRatios,
 } from "../interfaces";
+import { useTranslation } from "react-i18next";
 import { useAssets, useLiabilities } from "../hooks/useBalanceSheetApi";
 import AddItemModal from "../components/BalanceSheet/AddItemModal";
 import EditItemModal from "../components/BalanceSheet/EditItemModal";
@@ -21,7 +22,9 @@ import FinancialSummary from "../components/BalanceSheet/FinancialSummary";
 import VisualizationDashboard from "../components/BalanceSheet/VisualizationDashboard";
 
 const BalanceSheet: React.FC = () => {
-  // 使用数据库 API hooks
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
+  // Use balance sheet API hooks
   const {
     assets,
     loading: assetsLoading,
@@ -46,6 +49,18 @@ const BalanceSheet: React.FC = () => {
     item: AssetItem | LiabilityItem;
   } | null>(null);
   const [addType, setAddType] = useState<"asset" | "liability">("asset");
+
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "CNY",
+        maximumFractionDigits: 2,
+      }),
+    [locale]
+  );
+
+  const formatCurrency = (amount: number) => currencyFormatter.format(amount);
 
   const calculateFinancialRatios = (): FinancialRatios => {
     if (!assets || !liabilities) {
@@ -97,7 +112,7 @@ const BalanceSheet: React.FC = () => {
       }
       setShowAddModal(false);
     } catch (error) {
-      console.error("添加项目失败:", error);
+      console.error("Failed to add item:", error);
     }
   };
 
@@ -113,7 +128,7 @@ const BalanceSheet: React.FC = () => {
       setShowEditModal(false);
       setEditingItem(null);
     } catch (error) {
-      console.error("更新项目失败:", error);
+      console.error("Failed to update item:", error);
     }
   };
 
@@ -125,37 +140,30 @@ const BalanceSheet: React.FC = () => {
         await deleteLiability(id);
       }
     } catch (error) {
-      console.error("删除项目失败:", error);
+      console.error("Failed to delete item:", error);
     }
   };
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat("zh-CN", {
-      style: "currency",
-      currency: "CNY",
-    }).format(amount);
-  };
-
-  // 加载状态
+  // Loading state
   if (assetsLoading || liabilitiesLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="flex items-center gap-3 text-slate-600">
           <Loader2 className="h-6 w-6 animate-spin" />
-          <span>加载资产负债数据中...</span>
+          <span>{t("balanceSheet.loadingData")}</span>
         </div>
       </div>
     );
   }
 
-  // 错误状态
+  // Error state
   if (assetsError || liabilitiesError) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 flex items-center justify-center">
         <div className="bg-white rounded-lg shadow-lg p-6 max-w-md">
           <div className="flex items-center gap-3 text-red-600 mb-4">
             <AlertCircle className="h-6 w-6" />
-            <span className="font-semibold">加载数据失败</span>
+            <span className="font-semibold">{t("balanceSheet.loadErrorTitle")}</span>
           </div>
           <p className="text-slate-600">{assetsError || liabilitiesError}</p>
         </div>
@@ -168,15 +176,13 @@ const BalanceSheet: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8 px-4">
       <div className="max-w-7xl mx-auto">
-        {/* 页面标题区域 */}
+        {/* Page header */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-4">
             <DollarSign className="h-8 w-8 text-emerald-600" />
-            <h1 className="text-3xl font-bold text-slate-800">资产负债管理</h1>
+            <h1 className="text-3xl font-bold text-slate-800">{t("balanceSheet.pageTitle")}</h1>
           </div>
-          <p className="text-slate-600 max-w-2xl">
-            管理您的个人财务，追踪资产与负债，实现财富增长目标
-          </p>
+          <p className="text-slate-600 max-w-2xl">{t("balanceSheet.pageDescription")}</p>
         </div>
 
         <FinancialSummary ratios={ratios} />
@@ -186,13 +192,13 @@ const BalanceSheet: React.FC = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-8 mb-8">
-          {/* 资产部分 */}
+          {/* Assets section */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <TrendingUp className="h-6 w-6 text-white" />
-                  <h2 className="text-xl font-semibold text-white">资产</h2>
+                  <h2 className="text-xl font-semibold text-white">{t("balanceSheet.assets")}</h2>
                 </div>
                 <button
                   onClick={() => {
@@ -209,8 +215,8 @@ const BalanceSheet: React.FC = () => {
             <div className="p-6">
               <div className="mb-6">
                 <h3 className="text-lg font-medium text-slate-700 mb-3 flex items-center gap-2">
-                  流动资产
-                  <span className="text-sm text-slate-500">(现金及等价物)</span>
+                  {t("balanceSheet.currentAssets")}
+                  <span className="text-sm text-slate-500">{t("balanceSheet.currentAssetsHint")}</span>
                 </h3>
                 <div className="space-y-3">
                   {(assets || [])
@@ -256,8 +262,8 @@ const BalanceSheet: React.FC = () => {
 
               <div>
                 <h3 className="text-lg font-medium text-slate-700 mb-3 flex items-center gap-2">
-                  非流动资产
-                  <span className="text-sm text-slate-500">(长期投资)</span>
+                  {t("balanceSheet.nonCurrentAssets")}
+                  <span className="text-sm text-slate-500">{t("balanceSheet.nonCurrentAssetsHint")}</span>
                 </h3>
                 <div className="space-y-3">
                   {(assets || [])
@@ -304,7 +310,7 @@ const BalanceSheet: React.FC = () => {
               <div className="mt-6 pt-4 border-t border-green-200">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-slate-700">
-                    总资产
+                    {t("balanceSheet.totalAssets")}
                   </span>
                   <span className="text-xl font-bold text-green-600">
                     {formatCurrency(ratios.totalAssets)}
@@ -314,13 +320,13 @@ const BalanceSheet: React.FC = () => {
             </div>
           </div>
 
-          {/* 负债部分 */}
+          {/* Liabilities section */}
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-red-500 to-pink-600 px-6 py-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <TrendingDown className="h-6 w-6 text-white" />
-                  <h2 className="text-xl font-semibold text-white">负债</h2>
+                  <h2 className="text-xl font-semibold text-white">{t("balanceSheet.liabilities")}</h2>
                 </div>
                 <button
                   onClick={() => {
@@ -337,8 +343,8 @@ const BalanceSheet: React.FC = () => {
             <div className="p-6">
               <div className="mb-6">
                 <h3 className="text-lg font-medium text-slate-700 mb-3 flex items-center gap-2">
-                  流动负债
-                  <span className="text-sm text-slate-500">(短期债务)</span>
+                  {t("balanceSheet.currentLiabilities")}
+                  <span className="text-sm text-slate-500">{t("balanceSheet.currentLiabilitiesHint")}</span>
                 </h3>
                 <div className="space-y-3">
                   {(liabilities || [])
@@ -388,8 +394,8 @@ const BalanceSheet: React.FC = () => {
 
               <div>
                 <h3 className="text-lg font-medium text-slate-700 mb-3 flex items-center gap-2">
-                  非流动负债
-                  <span className="text-sm text-slate-500">(长期债务)</span>
+                  {t("balanceSheet.nonCurrentLiabilities")}
+                  <span className="text-sm text-slate-500">{t("balanceSheet.nonCurrentLiabilitiesHint")}</span>
                 </h3>
                 <div className="space-y-3">
                   {(liabilities || [])
@@ -440,7 +446,7 @@ const BalanceSheet: React.FC = () => {
               <div className="mt-6 pt-4 border-t border-red-200">
                 <div className="flex justify-between items-center">
                   <span className="text-lg font-semibold text-slate-700">
-                    总负债
+                    {t("balanceSheet.totalLiabilities")}
                   </span>
                   <span className="text-xl font-bold text-red-600">
                     {formatCurrency(ratios.totalLiabilities)}
@@ -452,7 +458,7 @@ const BalanceSheet: React.FC = () => {
         </div>
       </div>
 
-      {/* 模态框 */}
+      {/* Modals */}
       {showAddModal && (
         <AddItemModal
           type={addType}

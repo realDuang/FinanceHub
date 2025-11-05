@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { X } from "lucide-react";
 import type { AssetItem, LiabilityItem } from "../../interfaces";
+import { useTranslation } from "react-i18next";
 
 interface EditItemModalProps {
   type: "asset" | "liability";
@@ -15,11 +16,19 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   onSave,
   onClose,
 }) => {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: item.name,
     value: item.value.toString(),
     category: item.category,
   });
+
+  const symbol = t("currency.symbol");
+  const title = t(`balanceSheet.modals.title.edit.${type}`);
+  const nameLabel = t(`balanceSheet.modals.nameLabel.${type}`);
+  const namePlaceholder = t(`balanceSheet.modals.namePlaceholder.${type}`);
+  const amountLabel = t("balanceSheet.modals.amountLabel", { symbol });
+  const categoryLabel = t("balanceSheet.modals.categoryLabel");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,34 +42,43 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     });
   };
 
-  const assetCurrentOptions = [
-    {
-      value: "current",
-      label: "流动资产",
-      description: "现金、存款、投资等可快速变现的资产",
-    },
-    {
-      value: "non-current",
-      label: "非流动资产",
-      description: "房产、车辆等长期持有的资产",
-    },
-  ];
-
-  const liabilityCurrentOptions = [
-    {
-      value: "current",
-      label: "流动负债",
-      description: "信用卡债务、短期借款等",
-    },
-    {
-      value: "non-current",
-      label: "非流动负债",
-      description: "房贷、车贷等长期债务",
-    },
-  ];
-
-  const options =
-    type === "asset" ? assetCurrentOptions : liabilityCurrentOptions;
+  const options = useMemo(
+    () =>
+      type === "asset"
+        ? [
+            {
+              value: "current",
+              label: t("balanceSheet.currentAssets"),
+              description: t(
+                "balanceSheet.modals.categoryDescription.asset.current"
+              ),
+            },
+            {
+              value: "non-current",
+              label: t("balanceSheet.nonCurrentAssets"),
+              description: t(
+                "balanceSheet.modals.categoryDescription.asset.nonCurrent"
+              ),
+            },
+          ]
+        : [
+            {
+              value: "current",
+              label: t("balanceSheet.currentLiabilities"),
+              description: t(
+                "balanceSheet.modals.categoryDescription.liability.current"
+              ),
+            },
+            {
+              value: "non-current",
+              label: t("balanceSheet.nonCurrentLiabilities"),
+              description: t(
+                "balanceSheet.modals.categoryDescription.liability.nonCurrent"
+              ),
+            },
+          ],
+    [t, type]
+  );
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -76,7 +94,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 type === "asset" ? "text-blue-700" : "text-orange-700"
               }`}
             >
-              编辑{type === "asset" ? "资产" : "负债"}项目
+              {title}
             </h3>
             <button
               onClick={onClose}
@@ -90,7 +108,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              {type === "asset" ? "资产" : "负债"}名称
+              {nameLabel}
             </label>
             <input
               type="text"
@@ -98,11 +116,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
               onChange={(e) =>
                 setFormData((prev) => ({ ...prev, name: e.target.value }))
               }
-              placeholder={
-                type === "asset"
-                  ? "如：银行存款、房产等"
-                  : "如：信用卡债务、房贷等"
-              }
+              placeholder={namePlaceholder}
               className="w-full px-4 py-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
@@ -110,7 +124,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              金额 (¥)
+              {amountLabel}
             </label>
             <input
               type="number"
@@ -128,7 +142,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-2">
-              分类
+              {categoryLabel}
             </label>
             <div className="space-y-3">
               {options.map((option) => (
@@ -168,7 +182,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
               onClick={onClose}
               className="flex-1 px-4 py-3 border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors"
             >
-              取消
+              {t("common.cancel")}
             </button>
             <button
               type="submit"
@@ -178,7 +192,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   : "bg-orange-500 hover:bg-orange-600"
               }`}
             >
-              保存
+              {t("common.save")}
             </button>
           </div>
         </form>

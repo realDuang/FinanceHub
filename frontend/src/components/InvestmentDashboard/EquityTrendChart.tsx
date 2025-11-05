@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Chart as ChartJS,
   TimeScale,
@@ -12,6 +12,7 @@ import {
 } from "chart.js";
 import "chartjs-adapter-date-fns";
 import { Chart } from "react-chartjs-2";
+import { useTranslation } from "react-i18next";
 import type { PortfolioEquityPoint } from "../../services/types";
 
 ChartJS.register(TimeScale, LinearScale, PointElement, LineElement, Tooltip, Legend, Filler);
@@ -23,10 +24,13 @@ interface EquityTrendChartProps {
 }
 
 const EquityTrendChart: React.FC<EquityTrendChartProps> = ({ data, loading, currency }) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
+
   if (loading) {
     return (
       <div className="bg-white shadow-lg rounded-2xl p-6 flex items-center justify-center h-96">
-        <span className="text-gray-500">Loading equity curve...</span>
+        <span className="text-gray-500">{t("investment.equityTrendChart.loading")}</span>
       </div>
     );
   }
@@ -34,7 +38,7 @@ const EquityTrendChart: React.FC<EquityTrendChartProps> = ({ data, loading, curr
   if (!data.length) {
     return (
       <div className="bg-white shadow-lg rounded-2xl p-6 flex items-center justify-center h-96">
-        <span className="text-gray-500">No equity history available</span>
+        <span className="text-gray-500">{t("investment.equityTrendChart.empty")}</span>
       </div>
     );
   }
@@ -48,7 +52,7 @@ const EquityTrendChart: React.FC<EquityTrendChartProps> = ({ data, loading, curr
     datasets: [
       {
         type: "line" as const,
-        label: "Equity",
+        label: t("investment.equityTrendChart.equityLabel"),
         data: equitySeries,
         borderColor: "#6366f1",
         backgroundColor: "rgba(99, 102, 241, 0.15)",
@@ -59,7 +63,7 @@ const EquityTrendChart: React.FC<EquityTrendChartProps> = ({ data, loading, curr
       },
       {
         type: "line" as const,
-        label: "P&L",
+        label: t("investment.equityTrendChart.pnlLabel"),
         data: pnlSeries,
         borderColor: "#22c55e",
         backgroundColor: "rgba(34, 197, 94, 0.15)",
@@ -71,11 +75,15 @@ const EquityTrendChart: React.FC<EquityTrendChartProps> = ({ data, loading, curr
     ],
   };
 
-  const numberFormatter = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  });
+  const numberFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency,
+        maximumFractionDigits: 2,
+      }),
+    [currency, locale]
+  );
 
   const options: ChartOptions<"line"> = {
     responsive: true,
@@ -144,8 +152,12 @@ const EquityTrendChart: React.FC<EquityTrendChartProps> = ({ data, loading, curr
   return (
     <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition-shadow duration-300">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Equity Trend</h3>
-        <span className="text-sm text-gray-400">Last 30 days</span>
+        <h3 className="text-lg font-semibold text-gray-800">
+          {t("investment.equityTrendChart.title")}
+        </h3>
+        <span className="text-sm text-gray-400">
+          {t("investment.equityTrendChart.subtitle")}
+        </span>
       </div>
       <div className="h-96">
         <Chart type="line" data={chartData} options={options} updateMode="resize" />

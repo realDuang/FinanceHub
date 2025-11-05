@@ -16,8 +16,8 @@ const LanguageSwitcher: React.FC = () => {
       className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 transition-colors duration-200"
       title="Switch Language"
     >
-      <Languages className="w-5 h-5 text-gray-600" />
-      <span className="text-sm font-medium text-gray-700">
+      <Languages className="w-6 h-5 text-gray-600" />
+      <span className="text-xs font-medium text-gray-700 w-6">
         {i18n.language === 'zh-CN' ? 'EN' : '中文'}
       </span>
     </button>

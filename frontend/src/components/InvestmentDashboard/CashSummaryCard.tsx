@@ -1,30 +1,49 @@
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { PortfolioCashInfo } from "../../services/types";
 
 interface CashSummaryCardProps {
   cash: PortfolioCashInfo;
 }
 
-const numbers = (currency: string) =>
-  new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency,
-    maximumFractionDigits: 2,
-  });
-
 const CashSummaryCard: React.FC<CashSummaryCardProps> = ({ cash }) => {
-  const fmt = numbers(cash.currency || "USD");
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
+
+  const formatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: cash.currency || "USD",
+        maximumFractionDigits: 2,
+      }),
+    [cash.currency, locale]
+  );
 
   const rows = [
-    { label: "Total Assets", value: fmt.format(cash.total_assets) },
-    { label: "Available Cash", value: fmt.format(cash.available_cash) },
-    { label: "Buying Power", value: fmt.format(cash.buying_power) },
+    {
+      label: t("investment.cashCard.totalAssets"),
+      value: formatter.format(cash.total_assets),
+    },
+    {
+      label: t("investment.cashCard.availableCash"),
+      value: formatter.format(cash.available_cash),
+    },
+    {
+      label: t("investment.cashCard.buyingPower"),
+      value: formatter.format(cash.buying_power),
+    },
   ];
 
   return (
     <div className="bg-white shadow-lg rounded-2xl p-6 hover:shadow-xl transition-shadow duration-300">
       <div className="flex items-center justify-between mb-4">
-        <h3 className="text-lg font-semibold text-gray-800">Account Cash</h3>
-        <span className="text-sm text-gray-400">Currency · {cash.currency}</span>
+        <h3 className="text-lg font-semibold text-gray-800">
+          {t("investment.cashCard.title")}
+        </h3>
+        <span className="text-sm text-gray-400">
+          {t("investment.cashCard.currency")} · {cash.currency}
+        </span>
       </div>
       <div className="space-y-3">
         {rows.map((row) => (
