@@ -1,0 +1,408 @@
+{
+  "app": {
+    "title": "FinanceHub",
+    "subtitle": "Intelligent Financial Analysis Platform"
+  },
+  "nav": {
+    "balanceSheet": "Asset Dashboard",
+    "balanceSheetDesc": "Net Worth Management · Portfolio · Wealth Growth",
+    "cashFlowAnalysis": "Cash Flow Analysis",
+    "cashFlowAnalysisDesc": "Income & Expense Trends · Spending Patterns · Financial Insights",
+    "investmentDashboard": "Investment Dashboard",
+    "investmentDashboardDesc": "Real-time Holdings · Account Funds · Return Trends"
+  },
+  "common": {
+    "add": "Add",
+    "edit": "Edit",
+    "delete": "Delete",
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "close": "Close",
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "noData": "No Data",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "submit": "Submit",
+    "reset": "Reset",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "total": "Total",
+    "date": "Date",
+    "amount": "Amount",
+    "category": "Category",
+    "description": "Description",
+    "actions": "Actions",
+    "startDate": "Start Date",
+    "endDate": "End Date",
+    "all": "All",
+    "clear": "Clear",
+    "year": "Year",
+    "month": "Month",
+    "page": "Page",
+    "dataRange": "Data Range",
+    "customRange": "Custom Range",
+    "selectMonthRange": "Select Month Range",
+    "startMonth": "Start Month",
+    "endMonth": "End Month",
+    "clearCustomRange": "Clear Custom Range",
+    "apply": "Apply",
+    "refresh": "Refresh"
+  },
+  "balanceSheet": {
+    "title": "Balance Sheet",
+    "pageTitle": "Balance Sheet Manager",
+    "pageDescription": "Manage your personal finances, track assets and liabilities, and stay on top of your wealth goals.",
+    "loadingData": "Loading balance sheet data...",
+    "loadErrorTitle": "Failed to load data",
+    "assets": "Assets",
+    "liabilities": "Liabilities",
+    "currentAssets": "Current Assets",
+    "currentAssetsHint": "(Cash & equivalents)",
+    "nonCurrentAssets": "Non-Current Assets",
+    "nonCurrentAssetsHint": "(Long-term investments)",
+    "currentLiabilities": "Current Liabilities",
+    "currentLiabilitiesHint": "(Short-term debt)",
+    "nonCurrentLiabilities": "Non-Current Liabilities",
+    "nonCurrentLiabilitiesHint": "(Long-term debt)",
+    "totalAssets": "Total Assets",
+    "totalLiabilities": "Total Liabilities",
+    "netWorth": "Net Worth",
+    "addAsset": "Add Asset",
+    "addLiability": "Add Liability",
+    "editAsset": "Edit Asset",
+    "editLiability": "Edit Liability",
+    "deleteAsset": "Delete Asset",
+    "deleteLiability": "Delete Liability",
+    "assetName": "Asset Name",
+    "liabilityName": "Liability Name",
+    "value": "Value",
+    "currentRatio": "Current Ratio",
+    "debtToEquityRatio": "Debt to Equity Ratio",
+    "confirmDelete": "Confirm Delete",
+    "confirmDeleteMessage": "Are you sure you want to delete this item? This action cannot be undone.",
+    "addSuccess": "Added Successfully",
+    "updateSuccess": "Updated Successfully",
+    "deleteSuccess": "Deleted Successfully",
+    "addError": "Failed to Add",
+    "updateError": "Failed to Update",
+    "deleteError": "Failed to Delete",
+    "financialOverview": "Financial Overview",
+    "assetDistribution": "Asset Distribution",
+    "summaryTab": "Summary",
+    "detailsTab": "Details",
+    "modals": {
+      "title": {
+        "add": {
+          "asset": "Add Asset Item",
+          "liability": "Add Liability Item"
+        },
+        "edit": {
+          "asset": "Edit Asset Item",
+          "liability": "Edit Liability Item"
+        }
+      },
+      "nameLabel": {
+        "asset": "Asset Name",
+        "liability": "Liability Name"
+      },
+      "namePlaceholder": {
+        "asset": "e.g., Savings account, property",
+        "liability": "e.g., Credit card debt, mortgage"
+      },
+      "amountLabel": "Amount ({{symbol}})",
+      "categoryLabel": "Category",
+      "categoryDescription": {
+        "asset": {
+          "current": "Cash, deposits, or investments that can be liquidated quickly",
+          "nonCurrent": "Property, vehicles, and other long-term holdings"
+        },
+        "liability": {
+          "current": "Credit cards, short-term loans, and similar obligations",
+          "nonCurrent": "Mortgage, auto loan, and other long-term debt"
+        }
+      }
+    },
+    "summary": {
+      "title": "Financial Health Overview",
+      "currentRatio": {
+        "label": "Current Ratio",
+        "status": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "warning": "Needs Attention"
+        },
+        "formula": "Current assets ÷ Current liabilities"
+      },
+      "debtRatio": {
+        "label": "Debt to Equity Ratio",
+        "status": {
+          "excellent": "Excellent",
+          "good": "Good",
+          "warning": "Needs Attention"
+        },
+        "formula": "Total liabilities ÷ Net worth"
+      },
+      "netWorth": {
+        "label": "Net Worth Ratio",
+        "status": {
+          "positive": "Healthy",
+          "negative": "At Risk"
+        },
+        "formula": "Net worth ÷ Total assets"
+      },
+      "totals": {
+        "assets": "Total Assets",
+        "liabilities": "Total Liabilities",
+        "netWorth": "Net Worth"
+      }
+    },
+    "visualization": {
+      "noDataTitle": "No asset data yet",
+      "noDataDescription": "Add your assets to visualize the composition of your portfolio here.",
+      "distributionTitle": "Asset Allocation",
+      "tooltip": "{{label}}: {{value}} ({{percentage}})"
+    }
+  },
+  "cashFlow": {
+    "title": "Cash Flow Analysis",
+    "overview": "Overview",
+    "transactions": "Transaction Details",
+    "timeRange": "Time Range",
+    "thisMonth": "This Month",
+    "lastMonth": "Last Month",
+    "last3Months": "Last 3 Months",
+    "last6Months": "Last 6 Months",
+    "thisYear": "This Year",
+    "lastYear": "Last Year",
+    "all": "All",
+    "income": "Income",
+    "expense": "Expense",
+    "balance": "Balance",
+    "totalIncome": "Total Income",
+    "totalExpense": "Total Expense",
+    "netCashFlow": "Net Cash Flow",
+    "avgIncome": "Average Income",
+    "avgExpense": "Average Expense",
+    "avgConsumption": "Average Consumption",
+    "recentAvgConsumption": "Recent Average Consumption",
+    "monthlyTrend": "Monthly Trend",
+    "categoryDistribution": "Category Distribution",
+    "topExpenses": "Top Expenses",
+    "importData": "Import Data",
+    "exportData": "Export Data",
+    "importSuccess": "Import Successful",
+    "exportSuccess": "Export Successful",
+    "importError": "Import Failed",
+    "exportError": "Export Failed",
+    "financialOverview": "Financial Overview",
+    "salary": "Salary",
+    "socialExpenses": "Social",
+    "noFinancialData": "No Financial Data",
+    "pleaseImportData": "Please import transaction data to generate financial analysis reports"
+  },
+  "transaction": {
+    "title": "Transaction Details",
+    "transactionTime": "Transaction Time",
+    "type": "Type",
+    "amount": "Amount",
+    "incomeExpenseType": "Income/Expense",
+    "paymentMethod": "Payment Method",
+    "counterparty": "Counterparty",
+    "itemName": "Item Name",
+    "remarks": "Remarks",
+    "category": "Category",
+    "filterByDate": "Filter by Date",
+    "filterByCategory": "Filter by Category",
+    "filterByType": "Filter by Type",
+    "searchPlaceholder": "Search transactions...",
+    "noTransactions": "No Transactions",
+    "totalRecords": "Total {{count}} records",
+    "showingRecords": "Showing {{from}} - {{to}} of {{total}}"
+  },
+  "import": {
+    "title": "Import Data",
+    "selectFile": "Select File",
+    "dragAndDrop": "Drag and drop file here, or click to select",
+    "supportedFormats": "Supported formats: CSV",
+    "fileSelected": "File Selected",
+    "uploadAndImport": "Upload and Import",
+    "manualImport": "Manual CSV Import",
+    "alipayImport": "Alipay Bill Import",
+    "wechatImport": "WeChat Bill Import",
+    "importHistory": "Import History",
+    "importedRecords": "Imported {{count}} records",
+    "skippedRecords": "Skipped {{count}} records",
+    "duplicateRecords": "Duplicate {{count}} records",
+    "errorRecords": "Error {{count}} records",
+    "viewDetails": "View Details",
+    "hideDetails": "Hide Details",
+    "errorDetails": "Error Details",
+    "duplicateDetails": "Duplicate Details",
+    "requiredColumns": "Required Columns",
+    "columnMapping": "Column Mapping",
+    "preview": "Preview",
+    "reviewBeforeImport": "Review Before Import",
+    "selectDataSource": "Select Data Source",
+    "selectBillType": "Select Bill Type",
+    "downloadTemplate": "Download Template",
+    "parseSuccess": "Parse Successful",
+    "uploadFailed": "Upload Failed",
+    "parseFailed": "Parse Failed",
+    "importFailed": "Import Failed",
+    "retryPlease": "Please Retry"
+  },
+  "export": {
+    "title": "Export Data",
+    "selectDateRange": "Select Date Range",
+    "exportFormat": "Export Format",
+    "exportAll": "Export All",
+    "exportFiltered": "Export Filtered Results",
+    "downloading": "Downloading...",
+    "downloadComplete": "Download Complete",
+    "exportFailed": "Export Failed"
+  },
+  "investment": {
+    "title": "Investment Dashboard",
+    "portfolio": "Portfolio",
+    "holdings": "Holdings",
+    "cashSummary": "Cash Summary",
+    "equityTrend": "Equity Trend",
+    "totalEquity": "Total Equity",
+    "totalMarketValue": "Total Market Value",
+    "totalCost": "Total Cost",
+    "totalProfit": "Total Profit/Loss",
+    "profitRate": "Return Rate",
+    "availableCash": "Available Cash",
+    "frozenCash": "Frozen Cash",
+    "symbol": "Symbol",
+    "name": "Name",
+    "quantity": "Quantity",
+    "cost": "Cost",
+    "currentPrice": "Current Price",
+    "marketValue": "Market Value",
+    "profit": "Profit/Loss",
+    "profitPercent": "Profit/Loss %",
+    "noData": "No Investment Data",
+    "loading": "Loading...",
+    "pageDescription": "Real-time holdings, cash availability, and performance insights to support your investment planning.",
+    "account": {
+      "label": "Account"
+    },
+    "dataSource": {
+      "label": "Data Source"
+    },
+    "updatedAt": {
+      "label": "Updated"
+    },
+    "loadingData": "Preparing your investment data...",
+    "summaryCards": {
+      "totalMarketValue": "Total Market Value",
+      "cost": "Cost {{value}}",
+      "unrealizedPnL": "Unrealized P&L",
+      "pnlRatio": "Return {{value}}",
+      "todayPnL": "Today's P&L",
+      "todayRatio": "Daily Return {{value}}"
+    },
+    "cashCard": {
+      "title": "Account Cash",
+      "currency": "Currency",
+      "totalAssets": "Total Assets",
+      "availableCash": "Available Cash",
+      "buyingPower": "Buying Power"
+    },
+    "equityTrendChart": {
+      "title": "Equity Trend",
+      "subtitle": "Last 30 days",
+      "loading": "Loading equity curve...",
+      "empty": "No equity history available",
+      "equityLabel": "Equity",
+      "pnlLabel": "P&L"
+    },
+    "positions": {
+      "title": "Current Positions",
+      "count": "{{count}} items",
+      "loading": "Loading positions...",
+      "empty": "No positions to display",
+      "headers": {
+        "symbol": "Symbol",
+        "name": "Name",
+        "quantity": "Quantity",
+        "cost": "Cost",
+        "lastPrice": "Last Price",
+        "marketValue": "Market Value",
+        "unrealizedPnL": "Unrealized P&L",
+        "unrealizedPct": "Unrealized %",
+        "todayPnL": "Today P&L",
+        "todayPct": "Today %"
+      }
+    }
+  },
+  "chart": {
+    "income": "Income",
+    "expense": "Expense",
+    "balance": "Balance",
+    "trend": "Trend",
+    "distribution": "Distribution",
+    "comparison": "Comparison",
+    "month": "Month",
+    "amount": "Amount",
+    "percentage": "Percentage",
+    "noDataAvailable": "No Chart Data Available",
+    "monthlyIncome": "Monthly Income",
+    "monthlyExpense": "Monthly Expense",
+    "incomeExpenseTrend": "Income & Expense Trend",
+    "expenseByCategory": "Expense by Category",
+    "topExpenseCategories": "Top Expense Categories"
+  },
+  "categories": {
+    "housing": "Housing",
+    "dining": "Dining",
+    "living": "Living",
+    "entertainment": "Entertainment",
+    "transportation": "Transportation",
+    "travel": "Travel",
+    "gifts": "Gifts",
+    "transactions": "Transactions"
+  },
+  "dateFormat": {
+    "allData": "All Data",
+    "yearEnd": " End",
+    "monthEnd": " End",
+    "fullYear": " Full Year",
+    "to": " - "
+  },
+  "currency": {
+    "symbol": "$",
+    "locale": "en-US"
+  },
+  "error": {
+    "loadingFailed": "Loading Failed",
+    "saveFailed": "Save Failed",
+    "deleteFailed": "Delete Failed",
+    "importFailed": "Import Failed",
+    "exportFailed": "Export Failed",
+    "networkError": "Network Error",
+    "serverError": "Server Error",
+    "unknownError": "Unknown Error",
+    "invalidInput": "Invalid Input",
+    "requiredField": "This field is required",
+    "invalidDate": "Invalid Date Format",
+    "invalidAmount": "Invalid Amount Format"
+  },
+  "validation": {
+    "required": "This field is required",
+    "invalidEmail": "Invalid Email Format",
+    "invalidDate": "Invalid Date Format",
+    "invalidAmount": "Amount must be positive",
+    "minLength": "Minimum {{min}} characters required",
+    "maxLength": "Maximum {{max}} characters allowed",
+    "minValue": "Minimum value is {{min}}",
+    "maxValue": "Maximum value is {{max}}"
+  }
+}

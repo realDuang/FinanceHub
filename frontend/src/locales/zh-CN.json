@@ -1,0 +1,408 @@
+{
+  "app": {
+    "title": "FinanceHub",
+    "subtitle": "智能财务分析平台"
+  },
+  "nav": {
+    "balanceSheet": "资产仪表板",
+    "balanceSheetDesc": "净资产管理 · 投资组合 · 财富增长",
+    "cashFlowAnalysis": "现金流分析",
+    "cashFlowAnalysisDesc": "收支趋势 · 消费模式 · 财务洞察",
+    "investmentDashboard": "投资看板",
+    "investmentDashboardDesc": "实时持仓 · 账户资金 · 收益趋势"
+  },
+  "common": {
+    "add": "添加",
+    "edit": "编辑",
+    "delete": "删除",
+    "save": "保存",
+    "cancel": "取消",
+    "confirm": "确认",
+    "close": "关闭",
+    "loading": "加载中...",
+    "error": "错误",
+    "success": "成功",
+    "noData": "暂无数据",
+    "search": "搜索",
+    "filter": "筛选",
+    "export": "导出",
+    "import": "导入",
+    "submit": "提交",
+    "reset": "重置",
+    "back": "返回",
+    "next": "下一步",
+    "previous": "上一步",
+    "total": "总计",
+    "date": "日期",
+    "amount": "金额",
+    "category": "类别",
+    "description": "描述",
+    "actions": "操作",
+    "startDate": "开始日期",
+    "endDate": "结束日期",
+    "all": "全部",
+    "clear": "清空",
+    "year": "年",
+    "month": "月",
+    "page": "第",
+    "dataRange": "数据范围",
+    "customRange": "自定义范围",
+    "selectMonthRange": "选择月份范围",
+    "startMonth": "开始月份",
+    "endMonth": "结束月份",
+    "clearCustomRange": "清除自定义范围",
+    "apply": "确定",
+    "refresh": "刷新"
+  },
+  "balanceSheet": {
+    "title": "资产负债表",
+    "pageTitle": "资产负债管理",
+    "pageDescription": "管理您的个人财务，追踪资产与负债，实现财富增长目标",
+    "loadingData": "加载资产负债数据中...",
+    "loadErrorTitle": "加载数据失败",
+    "assets": "资产",
+    "liabilities": "负债",
+    "currentAssets": "流动资产",
+    "currentAssetsHint": "（现金及等价物）",
+    "nonCurrentAssets": "非流动资产",
+    "nonCurrentAssetsHint": "（长期投资）",
+    "currentLiabilities": "流动负债",
+    "currentLiabilitiesHint": "（短期债务）",
+    "nonCurrentLiabilities": "非流动负债",
+    "nonCurrentLiabilitiesHint": "（长期债务）",
+    "totalAssets": "总资产",
+    "totalLiabilities": "总负债",
+    "netWorth": "净资产",
+    "addAsset": "添加资产",
+    "addLiability": "添加负债",
+    "editAsset": "编辑资产",
+    "editLiability": "编辑负债",
+    "deleteAsset": "删除资产",
+    "deleteLiability": "删除负债",
+    "assetName": "资产名称",
+    "liabilityName": "负债名称",
+    "value": "价值",
+    "currentRatio": "流动比率",
+    "debtToEquityRatio": "资产负债率",
+    "confirmDelete": "确认删除",
+    "confirmDeleteMessage": "您确定要删除这个项目吗？此操作无法撤销。",
+    "addSuccess": "添加成功",
+    "updateSuccess": "更新成功",
+    "deleteSuccess": "删除成功",
+    "addError": "添加失败",
+    "updateError": "更新失败",
+    "deleteError": "删除失败",
+    "financialOverview": "财务概览",
+    "assetDistribution": "资产分布",
+    "summaryTab": "概要",
+    "detailsTab": "详情",
+    "modals": {
+      "title": {
+        "add": {
+          "asset": "添加资产项目",
+          "liability": "添加负债项目"
+        },
+        "edit": {
+          "asset": "编辑资产项目",
+          "liability": "编辑负债项目"
+        }
+      },
+      "nameLabel": {
+        "asset": "资产名称",
+        "liability": "负债名称"
+      },
+      "namePlaceholder": {
+        "asset": "如：银行存款、房产等",
+        "liability": "如：信用卡债务、房贷等"
+      },
+      "amountLabel": "金额 ({{symbol}})",
+      "categoryLabel": "分类",
+      "categoryDescription": {
+        "asset": {
+          "current": "现金、存款、投资等可快速变现的资产",
+          "nonCurrent": "房产、车辆等长期持有的资产"
+        },
+        "liability": {
+          "current": "信用卡债务、短期借款等",
+          "nonCurrent": "房贷、车贷等长期债务"
+        }
+      }
+    },
+    "summary": {
+      "title": "财务健康分析",
+      "currentRatio": {
+        "label": "流动比率",
+        "status": {
+          "excellent": "优秀",
+          "good": "良好",
+          "warning": "需改善"
+        },
+        "formula": "流动资产 ÷ 流动负债"
+      },
+      "debtRatio": {
+        "label": "负债权益比",
+        "status": {
+          "excellent": "优秀",
+          "good": "良好",
+          "warning": "需改善"
+        },
+        "formula": "总负债 ÷ 净资产"
+      },
+      "netWorth": {
+        "label": "资产净值率",
+        "status": {
+          "positive": "健康",
+          "negative": "风险"
+        },
+        "formula": "净资产 ÷ 总资产"
+      },
+      "totals": {
+        "assets": "总资产",
+        "liabilities": "总负债",
+        "netWorth": "净资产"
+      }
+    },
+    "visualization": {
+      "noDataTitle": "暂无资产数据",
+      "noDataDescription": "添加资产项目后，这里将显示您的资产组合分布图表",
+      "distributionTitle": "资产组合分布",
+      "tooltip": "{{label}}：{{value}} ({{percentage}})"
+    }
+  },
+  "cashFlow": {
+    "title": "现金流分析",
+    "overview": "概览",
+    "transactions": "交易明细",
+    "timeRange": "时间范围",
+    "thisMonth": "本月",
+    "lastMonth": "上月",
+    "last3Months": "近3个月",
+    "last6Months": "近6个月",
+    "thisYear": "本年",
+    "lastYear": "去年",
+    "all": "全部",
+    "income": "收入",
+    "expense": "支出",
+    "balance": "结余",
+    "totalIncome": "总收入",
+    "totalExpense": "总支出",
+    "netCashFlow": "净现金流",
+    "avgIncome": "平均收入",
+    "avgExpense": "平均支出",
+    "avgConsumption": "平均消费",
+    "recentAvgConsumption": "近期平均消费",
+    "monthlyTrend": "月度趋势",
+    "categoryDistribution": "类别分布",
+    "topExpenses": "主要支出",
+    "importData": "导入数据",
+    "exportData": "导出数据",
+    "importSuccess": "导入成功",
+    "exportSuccess": "导出成功",
+    "importError": "导入失败",
+    "exportError": "导出失败",
+    "financialOverview": "财务概览",
+    "salary": "工资",
+    "socialExpenses": "人情",
+    "noFinancialData": "暂无财务数据",
+    "pleaseImportData": "请先导入交易数据以生成财务分析报表"
+  },
+  "transaction": {
+    "title": "交易明细",
+    "transactionTime": "交易时间",
+    "type": "类型",
+    "amount": "金额",
+    "incomeExpenseType": "收支",
+    "paymentMethod": "支付方式",
+    "counterparty": "交易对方",
+    "itemName": "商品名称",
+    "remarks": "备注",
+    "category": "类别",
+    "filterByDate": "按日期筛选",
+    "filterByCategory": "按类别筛选",
+    "filterByType": "按类型筛选",
+    "searchPlaceholder": "搜索交易...",
+    "noTransactions": "暂无交易记录",
+    "totalRecords": "共 {{count}} 条记录",
+    "showingRecords": "显示 {{from}} - {{to}} 条，共 {{total}} 条"
+  },
+  "import": {
+    "title": "导入数据",
+    "selectFile": "选择文件",
+    "dragAndDrop": "拖拽文件到此处，或点击选择文件",
+    "supportedFormats": "支持的格式: CSV",
+    "fileSelected": "已选择文件",
+    "uploadAndImport": "上传并导入",
+    "manualImport": "手动CSV导入",
+    "alipayImport": "支付宝账单导入",
+    "wechatImport": "微信账单导入",
+    "importHistory": "导入历史",
+    "importedRecords": "已导入 {{count}} 条记录",
+    "skippedRecords": "跳过 {{count}} 条记录",
+    "duplicateRecords": "重复 {{count}} 条记录",
+    "errorRecords": "错误 {{count}} 条记录",
+    "viewDetails": "查看详情",
+    "hideDetails": "隐藏详情",
+    "errorDetails": "错误详情",
+    "duplicateDetails": "重复记录详情",
+    "requiredColumns": "必需列",
+    "columnMapping": "列映射",
+    "preview": "预览",
+    "reviewBeforeImport": "导入前检查",
+    "selectDataSource": "选择数据源",
+    "selectBillType": "选择账单类型",
+    "downloadTemplate": "下载模板",
+    "parseSuccess": "解析成功",
+    "uploadFailed": "上传失败",
+    "parseFailed": "解析失败",
+    "importFailed": "导入失败",
+    "retryPlease": "请重试"
+  },
+  "export": {
+    "title": "导出数据",
+    "selectDateRange": "选择日期范围",
+    "exportFormat": "导出格式",
+    "exportAll": "导出全部",
+    "exportFiltered": "导出筛选结果",
+    "downloading": "下载中...",
+    "downloadComplete": "下载完成",
+    "exportFailed": "导出失败"
+  },
+  "investment": {
+    "title": "投资看板",
+    "portfolio": "投资组合",
+    "holdings": "持仓",
+    "cashSummary": "资金概况",
+    "equityTrend": "权益趋势",
+    "totalEquity": "总权益",
+    "totalMarketValue": "总市值",
+    "totalCost": "总成本",
+    "totalProfit": "总盈亏",
+    "profitRate": "收益率",
+    "availableCash": "可用资金",
+    "frozenCash": "冻结资金",
+    "symbol": "代码",
+    "name": "名称",
+    "quantity": "数量",
+    "cost": "成本",
+    "currentPrice": "现价",
+    "marketValue": "市值",
+    "profit": "盈亏",
+    "profitPercent": "盈亏比例",
+    "noData": "暂无投资数据",
+    "loading": "加载中...",
+    "pageDescription": "实时持仓、可用资金与收益洞察，助力你的投资规划。",
+    "account": {
+      "label": "账户"
+    },
+    "dataSource": {
+      "label": "数据源"
+    },
+    "updatedAt": {
+      "label": "更新于"
+    },
+    "loadingData": "正在准备投资数据...",
+    "summaryCards": {
+      "totalMarketValue": "总市值",
+      "cost": "成本 {{value}}",
+      "unrealizedPnL": "未实现盈亏",
+      "pnlRatio": "收益率 {{value}}",
+      "todayPnL": "当日盈亏",
+      "todayRatio": "当日收益率 {{value}}"
+    },
+    "cashCard": {
+      "title": "账户资金",
+      "currency": "币种",
+      "totalAssets": "资产合计",
+      "availableCash": "可用现金",
+      "buyingPower": "可用购买力"
+    },
+    "equityTrendChart": {
+      "title": "权益趋势",
+      "subtitle": "近30日",
+      "loading": "权益曲线加载中...",
+      "empty": "暂无权益历史数据",
+      "equityLabel": "权益",
+      "pnlLabel": "盈亏"
+    },
+    "positions": {
+      "title": "当前持仓",
+      "count": "共 {{count}} 项",
+      "loading": "持仓数据加载中...",
+      "empty": "暂无持仓数据",
+      "headers": {
+        "symbol": "代码",
+        "name": "名称",
+        "quantity": "数量",
+        "cost": "成本",
+        "lastPrice": "最新价",
+        "marketValue": "市值",
+        "unrealizedPnL": "未实现盈亏",
+        "unrealizedPct": "未实现%",
+        "todayPnL": "当日盈亏",
+        "todayPct": "当日%"
+      }
+    }
+  },
+  "chart": {
+    "income": "收入",
+    "expense": "支出",
+    "balance": "结余",
+    "trend": "趋势",
+    "distribution": "分布",
+    "comparison": "对比",
+    "month": "月份",
+    "amount": "金额",
+    "percentage": "百分比",
+    "noDataAvailable": "暂无图表数据",
+    "monthlyIncome": "月度收入",
+    "monthlyExpense": "月度支出",
+    "incomeExpenseTrend": "收支趋势",
+    "expenseByCategory": "类别支出",
+    "topExpenseCategories": "主要支出类别"
+  },
+  "categories": {
+    "housing": "住房",
+    "dining": "餐饮",
+    "living": "生活",
+    "entertainment": "娱乐",
+    "transportation": "交通",
+    "travel": "旅行",
+    "gifts": "礼物",
+    "transactions": "交易"
+  },
+  "dateFormat": {
+    "allData": "全部数据",
+    "yearEnd": "年底",
+    "monthEnd": "月底",
+    "fullYear": "年全年",
+    "to": " - "
+  },
+  "currency": {
+    "symbol": "￥",
+    "locale": "zh-CN"
+  },
+  "error": {
+    "loadingFailed": "加载失败",
+    "saveFailed": "保存失败",
+    "deleteFailed": "删除失败",
+    "importFailed": "导入失败",
+    "exportFailed": "导出失败",
+    "networkError": "网络错误",
+    "serverError": "服务器错误",
+    "unknownError": "未知错误",
+    "invalidInput": "输入无效",
+    "requiredField": "此字段为必填项",
+    "invalidDate": "日期格式无效",
+    "invalidAmount": "金额格式无效"
+  },
+  "validation": {
+    "required": "此字段为必填项",
+    "invalidEmail": "邮箱格式无效",
+    "invalidDate": "日期格式无效",
+    "invalidAmount": "金额必须为正数",
+    "minLength": "最少需要 {{min}} 个字符",
+    "maxLength": "最多允许 {{max}} 个字符",
+    "minValue": "最小值为 {{min}}",
+    "maxValue": "最大值为 {{max}}"
+  }
+}

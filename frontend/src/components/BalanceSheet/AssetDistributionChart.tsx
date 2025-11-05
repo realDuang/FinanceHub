@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import {
   Chart as ChartJS,
   ArcElement,
@@ -8,6 +8,7 @@ import {
 } from "chart.js";
 import { Doughnut } from "react-chartjs-2";
 import type { AssetDistribution } from "../../interfaces";
+import { useTranslation } from "react-i18next";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
@@ -18,18 +19,34 @@ interface AssetDistributionChartProps {
 const AssetDistributionChart: React.FC<AssetDistributionChartProps> = ({
   data,
 }) => {
+  const { t, i18n } = useTranslation();
   const chartRef = useRef<ChartJS<"doughnut">>(null);
 
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("zh-CN", {
-      style: "currency",
-      currency: "CNY",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(value);
-  };
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
 
-  // 计算总值用于百分比计算
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "CNY",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }),
+    [locale]
+  );
+
+  const percentFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    [locale]
+  );
+
+  const formatCurrency = (value: number) => currencyFormatter.format(value);
+
+  // Compute aggregate value for percentage calculations
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const chartData = {
@@ -50,7 +67,7 @@ const AssetDistributionChart: React.FC<AssetDistributionChartProps> = ({
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        display: data.length <= 6, // 当数据项超过6个时隐藏图例
+        display: data.length <= 6, // Hide legend when too many entries
         position: "bottom" as const,
         labels: {
           padding: 15,
@@ -72,10 +89,12 @@ const AssetDistributionChart: React.FC<AssetDistributionChartProps> = ({
         callbacks: {
           label: function (context) {
             const value = context.parsed as number;
-            const percentage = ((value / total) * 100).toFixed(1);
-            return `${context.label}: ${formatCurrency(
-              value
-            )} (${percentage}%)`;
+            const percentage = total === 0 ? 0 : value / total;
+            return t("balanceSheet.visualization.tooltip", {
+              label: context.label,
+              value: formatCurrency(value),
+              percentage: percentFormatter.format(percentage),
+            });
           },
         },
       },

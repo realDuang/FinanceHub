@@ -7,7 +7,8 @@ import {
   ChartOptions,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { expenseCategories } from "../../utils/chart-utils";
+import { useTranslation } from "react-i18next";
+import { expenseCategories, getCategoryLabel } from "../../utils/chart-utils";
 import { FinancialAggregationRecord } from "../../services/types";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -22,13 +23,14 @@ const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
   loading,
 }) => {
   const chartRef = useRef<ChartJS<"doughnut">>(null);
+  const { t } = useTranslation();
 
-  // 处理 loading 状态和空数据
+  // Handle loading state and empty data
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
         <div className="h-96 w-full flex items-center justify-center">
-          <div className="text-gray-500">加载中...</div>
+          <div className="text-gray-500">{t('common.loading')}</div>
         </div>
       </div>
     );
@@ -38,7 +40,7 @@ const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
     return (
       <div className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow duration-300">
         <div className="h-96 w-full flex items-center justify-center">
-          <div className="text-gray-500">暂无数据</div>
+          <div className="text-gray-500">{t('common.noData')}</div>
         </div>
       </div>
     );
@@ -47,6 +49,7 @@ const ExpensePieChart: React.FC<ExpensePieChartProps> = ({
   const categoryData = expenseCategories
     .map((category) => ({
       ...category,
+      label: getCategoryLabel(category.key, t),
       value: Math.abs(
         financialData.reduce((sum, record) => {
           const categoryValue = record[category.key as keyof FinancialAggregationRecord];

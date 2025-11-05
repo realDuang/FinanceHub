@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { PieChart, BarChart3 } from "lucide-react";
 import type { AssetItem, AssetDistribution } from "../../interfaces";
 import AssetDistributionChart from "./AssetDistributionChart";
+import { useTranslation } from "react-i18next";
 
 interface VisualizationDashboardProps {
   assets: AssetItem[];
@@ -10,24 +11,37 @@ interface VisualizationDashboardProps {
 const VisualizationDashboard: React.FC<VisualizationDashboardProps> = ({
   assets,
 }) => {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language === "zh-CN" ? "zh-CN" : "en-US";
+
+  const currencyFormatter = useMemo(
+    () =>
+      new Intl.NumberFormat(locale, {
+        style: "currency",
+        currency: "CNY",
+        minimumFractionDigits: 0,
+      }),
+    [locale]
+  );
+
   const generateAssetDistribution = (): AssetDistribution[] => {
     const distribution: AssetDistribution[] = [];
 
-    // 预定义颜色数组，用于为不同资产分配颜色
+    // Predefined color palette for asset segments
     const assetColors = [
-      "#10b981", // 翠绿色
-      "#3b82f6", // 蓝色
-      "#f59e0b", // 橙色
-      "#8b5cf6", // 紫色
-      "#06b6d4", // 青色
-      "#84cc16", // 柠檬绿
-      "#f97316", // 深橙色
-      "#6366f1", // 靛蓝色
-      "#14b8a6", // 蓝绿色
-      "#a855f7", // 紫罗兰色
+      "#10b981", // emerald green
+      "#3b82f6", // blue
+      "#f59e0b", // orange
+      "#8b5cf6", // purple
+      "#06b6d4", // cyan
+      "#84cc16", // lime
+      "#f97316", // deep orange
+      "#6366f1", // indigo
+      "#14b8a6", // teal
+      "#a855f7", // violet
     ];
 
-    // 为每个具体的资产项目创建分布数据（不包含负债）
+    // Build distribution data for each asset item (liabilities excluded)
     assets.forEach((asset, index) => {
       if (asset.value > 0) {
         distribution.push({
@@ -49,10 +63,10 @@ const VisualizationDashboard: React.FC<VisualizationDashboardProps> = ({
       <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
         <BarChart3 className="h-16 w-16 text-slate-300 mx-auto mb-4" />
         <h3 className="text-lg font-medium text-slate-600 mb-2">
-          暂无资产数据
+          {t("balanceSheet.visualization.noDataTitle")}
         </h3>
         <p className="text-slate-500">
-          添加资产项目后，这里将显示您的资产组合分布图表
+          {t("balanceSheet.visualization.noDataDescription")}
         </p>
       </div>
     );
@@ -60,12 +74,14 @@ const VisualizationDashboard: React.FC<VisualizationDashboardProps> = ({
 
   return (
     <div className="space-y-8">
-      {/* 资产分布图 */}
+      {/* Asset distribution */}
       <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
         <div className="bg-gradient-to-r from-blue-500 to-indigo-600 px-6 py-4">
           <div className="flex items-center gap-3">
             <PieChart className="h-6 w-6 text-white" />
-            <h2 className="text-xl font-semibold text-white">资产组合分布</h2>
+            <h2 className="text-xl font-semibold text-white">
+              {t("balanceSheet.visualization.distributionTitle")}
+            </h2>
           </div>
         </div>
         <div className="p-6">
@@ -87,11 +103,7 @@ const VisualizationDashboard: React.FC<VisualizationDashboardProps> = ({
                   className="text-lg font-bold"
                   style={{ color: item.color }}
                 >
-                  {new Intl.NumberFormat("zh-CN", {
-                    style: "currency",
-                    currency: "CNY",
-                    minimumFractionDigits: 0,
-                  }).format(item.value)}
+                  {currencyFormatter.format(item.value)}
                 </div>
               </div>
             ))}
